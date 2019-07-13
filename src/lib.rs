@@ -33,6 +33,7 @@ use rocket::routes;
 
 use rocket_contrib::serve::StaticFiles;
 use rocket_contrib::templates::Template;
+use rocket_contrib::helmet::SpaceHelmet;
 
 use settings::CONFIG;
 
@@ -61,6 +62,7 @@ pub fn start_webservice() {
 
     rocket::ignite()
         .attach(Template::fairing())
+        .attach(SpaceHelmet::default())
         .mount("/", routes![routes::index])
         .mount("/img", StaticFiles::from("src/view/static/img"))
         .mount("/css", StaticFiles::from("src/view/static/css"))

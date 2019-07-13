@@ -36,4 +36,4 @@ chrono = "0.4.7"
 [dependencies.rocket_contrib]
 version = "0.4.2"
 default-features = false
-features = ["serve","handlebars_templates"]
+features = ["serve","handlebars_templates","helmet","json"]
