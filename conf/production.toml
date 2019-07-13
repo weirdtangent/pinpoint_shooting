@@ -1,0 +1,6 @@
+[server]
+run_level = "production"
+
+[webservice]
+bind_address = "0.0.0.0"
+bind_port = 80
