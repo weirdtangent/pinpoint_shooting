@@ -6,16 +6,20 @@ extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 #[macro_use]
+extern crate serde_json;
+#[macro_use]
 extern crate lazy_static;
 #[macro_use]
 extern crate rocket;
+extern crate rocket_contrib;
 
 mod settings;
 use settings::Settings;
 
-use std::error::Error;
+use log::{debug, info, warn};
 
-use log::{debug, info};
+use rocket_contrib::templates::Template;
+use rocket_contrib::serve::StaticFiles;
 
 // Load config file(s) into global static SETTINGS
 lazy_static! {
@@ -27,28 +31,35 @@ fn main() {
     start_webservice();
 }
 
-fn setup_logging() {
-    simple_logger::init_with_level(log::Level::Info).unwrap();
-    let run_level = &SETTINGS.server.run_level;
-    info!("Running as run_level {}", run_level);
-}
-
 fn start_webservice() {
     // start rocket webservice
     let bind_address = &SETTINGS.webservice.bind_address;
     let bind_port = &SETTINGS.webservice.bind_port;
     let version = include_str!("version.txt");
 
-    rocket::ignite().mount("/", routes![index]).launch();
+    rocket::ignite()
+        .attach(Template::fairing())
+        .mount("/", routes![index])
+        .mount("/img", StaticFiles::from("src/view/static/img"))
+        .mount("/css", StaticFiles::from("src/view/static/css"))
+        .mount("/js", StaticFiles::from("src/view/static/js"))
+        .launch();
 
-    info!(
+    warn!(
         "Listening on {}:{} as version {}",
         bind_address, bind_port, version
     );
 }
 
+fn setup_logging() {
+    simple_logger::init_with_level(log::Level::Info)
+        .expect("Tried to start the logging system but it had already started");
+    let run_level = &SETTINGS.server.run_level;
+    warn!("Running as run_level {}", run_level);
+}
 
 #[get("/")]
-fn index() -> &'static str {
-    "Hello, World!"
+fn index() -> rocket_contrib::templates::Template {
+    let context = json!({"title": "Greeting", "greeting": "Welcome to templates"});
+    Template::render("index", &context)
 }
