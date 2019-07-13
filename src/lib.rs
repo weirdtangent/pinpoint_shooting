@@ -1,9 +1,23 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
+extern crate config;
+#[macro_use]
+extern crate diesel;
+extern crate dotenv;
+extern crate rocket;
+extern crate rocket_contrib;
+extern crate serde;
+extern crate serde_derive;
+extern crate serde_json;
+
 #[path = "routes.rs"]
-mod routes;
+pub mod routes;
 #[path = "settings.rs"]
-mod settings;
+pub mod settings;
+#[path = "schema.rs"]
+pub mod schema;
+#[path = "models.rs"]
+pub mod models;
 
 use log::warn;
 
@@ -18,6 +32,8 @@ use rocket_contrib::serve::StaticFiles;
 use rocket_contrib::templates::Template;
 
 use settings::CONFIG;
+
+
 
 pub fn setup_logging() {
     let config = CONFIG.lock().unwrap();

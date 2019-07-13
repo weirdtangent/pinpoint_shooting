@@ -3,8 +3,17 @@ name = "pinpoint_shooting"
 version = "0.1.0"
 authors = ["Jeff Culverhouse <jeff@graystorm.com>"]
 edition = "2018"
+default-run = "pps"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "ppslib"
+path = "src/lib.rs"
+
+[[bin]]
+name = "pps"
+path = "src/bin/pps.rs"
 
 [dependencies]
 log = "0.4.7"
