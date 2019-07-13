@@ -1,12 +1,14 @@
+#![feature(proc_macro_hygiene, decl_macro)]
+
 extern crate config;
-extern crate handlebars_iron as hbs;
-extern crate iron;
 extern crate serde;
 
 #[macro_use]
 extern crate serde_derive;
 #[macro_use]
 extern crate lazy_static;
+#[macro_use]
+extern crate rocket;
 
 mod settings;
 use settings::Settings;
@@ -14,9 +16,6 @@ use settings::Settings;
 use std::error::Error;
 
 use log::{debug, info};
-
-use iron::prelude::{Chain, Iron, Request, Response};
-use iron::{status, Set};
 
 // Load config file(s) into global static SETTINGS
 lazy_static! {
@@ -35,32 +34,21 @@ fn setup_logging() {
 }
 
 fn start_webservice() {
-    // setup Handlebars templating directory
-    let mut hbse = hbs::HandlebarsEngine::new();
-    hbse.add(Box::new(hbs::DirectorySource::new("./src/view/", ".hbs")));
-    if let Err(r) = hbse.reload() {
-        panic!("{:?}", r.description());
-    }
-
-    //
-    let mut chain = Chain::new(|_: &mut Request| {
-        let mut resp = Response::new();
-        resp.set_mut(hbs::Template::new("index", "".to_string()))
-            .set_mut(status::Ok);
-        Ok(resp)
-    });
-    chain.link_after(hbse);
-
-    // start iron webservice
+    // start rocket webservice
     let bind_address = &SETTINGS.webservice.bind_address;
     let bind_port = &SETTINGS.webservice.bind_port;
-    let _server_guard = Iron::new(chain)
-        .http(format!("{}:{}", bind_address, bind_port))
-        .unwrap();
     let version = include_str!("version.txt");
+
+    rocket::ignite().mount("/", routes![index]).launch();
 
     info!(
         "Listening on {}:{} as version {}",
         bind_address, bind_port, version
     );
+}
+
+
+#[get("/")]
+fn index() -> &'static str {
+    "Hello, World!"
 }

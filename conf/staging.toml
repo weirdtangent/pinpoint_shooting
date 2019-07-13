@@ -1,0 +1,6 @@
+[server]
+run_level = "staging"
+
+[webservice]
+bind_address = "0.0.0.0"
+bind_port = 3000
