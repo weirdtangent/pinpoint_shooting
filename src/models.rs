@@ -1,13 +1,23 @@
 use diesel::Queryable;
 
 #[derive(Queryable)]
-
 pub struct User {
-    pub user_id: u32,
+    pub user_id: i32,
     pub user_name: String,
     pub password: String,
     pub email: String,
     pub real_name: String,
-    pub create_time: String,
-    pub modify_time: String,
+    pub create_time: chrono::NaiveDateTime,
+    pub modify_time: chrono::NaiveDateTime,
+}
+
+use super::schema::users;
+
+#[derive(Insertable)]
+#[table_name = "users"]
+pub struct NewUser<'a> {
+    pub user_name: &'a str,
+    pub password: &'a str,
+    pub email: &'a str,
+    pub real_name: &'a str,
 }

@@ -1,8 +1,11 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
+extern crate crypto;
+extern crate rand;
 extern crate config;
 #[macro_use]
 extern crate diesel;
+extern crate chrono;
 extern crate dotenv;
 extern crate rocket;
 extern crate rocket_contrib;
@@ -10,20 +13,20 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
 
-#[path = "routes.rs"]
-pub mod routes;
-#[path = "settings.rs"]
-pub mod settings;
-#[path = "schema.rs"]
-pub mod schema;
-#[path = "models.rs"]
+//#[path = "models.rs"]
 pub mod models;
+//#[path = "routes.rs"]
+pub mod routes;
+//#[path = "schema.rs"]
+pub mod schema;
+//#[path = "settings.rs"]
+pub mod settings;
+pub mod crypt;
 
 use log::warn;
 
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
-use dotenv::dotenv;
 use std::env;
 
 use rocket::routes;
@@ -32,8 +35,6 @@ use rocket_contrib::serve::StaticFiles;
 use rocket_contrib::templates::Template;
 
 use settings::CONFIG;
-
-
 
 pub fn setup_logging() {
     let config = CONFIG.lock().unwrap();
@@ -45,10 +46,9 @@ pub fn setup_logging() {
 }
 
 pub fn setup_db() -> PgConnection {
-    dotenv().ok();
+    let config = CONFIG.lock().unwrap();
 
-    let db_url = env::var("DATABASE_URL").expect("env DATABASE_URL missing");
-    PgConnection::establish(&db_url).expect(&format!("Error connecting to db"))
+    PgConnection::establish(&config.database_url).expect(&format!("Error connecting to db"))
 }
 
 pub fn start_webservice() {
@@ -71,4 +71,28 @@ pub fn start_webservice() {
         "Listening on {}:{} as version {}",
         bind_address, bind_port, version
     );
+}
+
+use self::models::{NewUser, User};
+
+pub fn create_user<'a>(
+    connection: &PgConnection,
+    user_name: &'a str,
+    password: &'a str,
+    email: &'a str,
+    real_name: &'a str,
+) -> User {
+    use schema::users;
+
+    let new_user = NewUser {
+        user_name: user_name,
+        password: password,
+        email: email,
+        real_name: real_name,
+    };
+
+    diesel::insert_into(users::table)
+        .values(&new_user)
+        .get_result(connection)
+        .expect("Error saving new user")
 }
