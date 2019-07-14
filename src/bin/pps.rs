@@ -2,12 +2,10 @@
 
 extern crate ppslib;
 
-use ppslib::settings::CONFIG;
+use ppslib::*;
 
 fn main() {
-    println!("{:?}", CONFIG.lock().unwrap());
-
-    ppslib::setup_logging();
-    ppslib::setup_db();
-    ppslib::start_webservice();
+    setup_logging();
+    setup_db();
+    start_webservice();
 }

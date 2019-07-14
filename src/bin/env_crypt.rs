@@ -1,10 +1,10 @@
 extern crate ppslib;
 
 use self::ppslib::crypt::*;
-use rand_core::RngCore;
-use rand::rngs::OsRng;
-use std::io::stdin;
 use base64::encode;
+use rand::rngs::OsRng;
+use rand_core::RngCore;
+use std::io::stdin;
 
 fn main() {
     println!("What string to encrypt?");

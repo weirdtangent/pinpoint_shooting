@@ -1,8 +1,8 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
+extern crate config;
 extern crate crypto;
 extern crate rand;
-extern crate config;
 #[macro_use]
 extern crate diesel;
 extern crate chrono;
@@ -13,27 +13,22 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
 
-//#[path = "models.rs"]
-pub mod models;
-//#[path = "routes.rs"]
-pub mod routes;
-//#[path = "schema.rs"]
-pub mod schema;
-//#[path = "settings.rs"]
-pub mod settings;
 pub mod crypt;
+pub mod models;
+pub mod routes;
+pub mod schema;
+pub mod settings;
 
 use log::warn;
 
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
-use std::env;
 
 use rocket::routes;
 
+use rocket_contrib::helmet::SpaceHelmet;
 use rocket_contrib::serve::StaticFiles;
 use rocket_contrib::templates::Template;
-use rocket_contrib::helmet::SpaceHelmet;
 
 use settings::CONFIG;
 

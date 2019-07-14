@@ -1,10 +1,8 @@
-//#![feature(proc_macro_hygiene, decl_macro)]
-
-use config::{Config, ConfigError, Environment, File};
+use config::{Config, Environment, File};
 use dotenv::dotenv;
 use once_cell::sync::Lazy;
 use serde_derive::Deserialize;
-use std::{env, sync::Mutex, string};
+use std::{env, sync::Mutex};
 
 #[derive(Debug, Deserialize)]
 pub struct Server {
