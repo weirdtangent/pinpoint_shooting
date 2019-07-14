@@ -36,6 +36,8 @@ pub static CONFIG: Lazy<Settings> = Lazy::new(|| {
         .merge(File::with_name("conf/local").required(false))
         .unwrap()
         .merge(Environment::with_prefix("PPS"))
+        .unwrap()
+        .merge(Environment::new())
         .unwrap();
     match config.try_into() {
         Ok(c) => c,

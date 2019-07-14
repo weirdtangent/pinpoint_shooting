@@ -1,10 +1,11 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
+#[macro_use]
+extern crate diesel;
+
 extern crate config;
 extern crate crypto;
 extern crate rand;
-#[macro_use]
-extern crate diesel;
 extern crate chrono;
 extern crate dotenv;
 extern crate rocket;
