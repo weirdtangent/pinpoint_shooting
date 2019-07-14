@@ -2,7 +2,7 @@ use config::{Config, Environment, File};
 use dotenv::dotenv;
 use once_cell::sync::Lazy;
 use serde_derive::Deserialize;
-use std::{env, sync::Mutex};
+use std::env;
 
 #[derive(Debug, Deserialize)]
 pub struct Server {
@@ -20,9 +20,10 @@ pub struct Settings {
     pub server: Server,
     pub webservice: WebService,
     pub database_url: String,
+    pub google_maps_api_key: String,
 }
 
-pub static CONFIG: Lazy<Mutex<Settings>> = Lazy::new(|| {
+pub static CONFIG: Lazy<Settings> = Lazy::new(|| {
     dotenv().ok();
     let mut config = Config::default();
     let env = env::var("PPS_RUN_MODE").unwrap_or("development".into());
@@ -34,10 +35,10 @@ pub static CONFIG: Lazy<Mutex<Settings>> = Lazy::new(|| {
         .unwrap()
         .merge(File::with_name("conf/local").required(false))
         .unwrap()
-        .merge(Environment::with_prefix("pps"))
+        .merge(Environment::with_prefix("PPS"))
         .unwrap();
     match config.try_into() {
-        Ok(c) => Mutex::new(c),
+        Ok(c) => c,
         Err(e) => panic!("error parsing config files: {}", e),
     }
 });

@@ -1,9 +1,28 @@
 body {
-  background-color: powderblue;
+  background-color: #123d18;
+  color: white;
 }
-h1 {
-  color: blue;
+
+div.header {
+  position: absolute;
+  width: 99%;
+  height: 100px;
 }
-p {
-  color: red;
+
+div.map {
+  float: left;
+  position: relative;
+  top: 100px;
+  width: 64.5%;
+  height: calc(100vh - 120px);
+  border: 1px solid white;
+}
+
+div.panel {
+  float: right;
+  position: relative;
+  top: 100px;
+  width: 34.5%;
+  height: calc(100vh - 120px);
+  border: 1px solid white;
 }

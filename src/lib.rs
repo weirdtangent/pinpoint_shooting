@@ -33,41 +33,36 @@ use rocket_contrib::templates::Template;
 use settings::CONFIG;
 
 pub fn setup_logging() {
-    let config = CONFIG.lock().unwrap();
-
     simple_logger::init_with_level(log::Level::Info)
         .expect("Tried to start the logging system but it had already started");
-    let run_level = &config.server.run_level;
+
+    let run_level = &CONFIG.server.run_level;
     warn!("Running as run_level {}", run_level);
 }
 
 pub fn setup_db() -> PgConnection {
-    let config = CONFIG.lock().unwrap();
-
-    PgConnection::establish(&config.database_url).expect(&format!("Error connecting to db"))
+    PgConnection::establish(&CONFIG.database_url).expect(&format!("Error connecting to db"))
 }
 
 pub fn start_webservice() {
-    let config = CONFIG.lock().unwrap();
+    let bind_address = &CONFIG.webservice.bind_address;
+    let bind_port = &CONFIG.webservice.bind_port;
 
     // start rocket webservice
-    let bind_address = &config.webservice.bind_address;
-    let bind_port = &config.webservice.bind_port;
     let version = include_str!("version.txt");
-
-    rocket::ignite()
-        .attach(Template::fairing())
-        .attach(SpaceHelmet::default())
-        .mount("/", routes![routes::index])
-        .mount("/img", StaticFiles::from("src/view/static/img"))
-        .mount("/css", StaticFiles::from("src/view/static/css"))
-        .mount("/js", StaticFiles::from("src/view/static/js"))
-        .launch();
 
     warn!(
         "Listening on {}:{} as version {}",
         bind_address, bind_port, version
     );
+    rocket::ignite()
+        .attach(Template::fairing())
+        .attach(SpaceHelmet::default())
+        .mount("/", routes![routes::index, routes::favicon])
+        .mount("/img", StaticFiles::from("src/view/static/img"))
+        .mount("/css", StaticFiles::from("src/view/static/css"))
+        .mount("/js", StaticFiles::from("src/view/static/js"))
+        .launch();
 }
 
 use self::models::{NewUser, User};
