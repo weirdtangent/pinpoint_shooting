@@ -1,28 +1,59 @@
 body {
-  background-color: #123d18;
-  color: white;
+	background-color: #123d18;
+	color: white;
 }
 
 div.header {
-  position: absolute;
-  width: 99%;
-  height: 100px;
+	position: absolute;
+    top: 0;
+    left: 202px;
+    right: 202px;
+	height: 148px;
+    background-color: white;
+}
+
+div.lh_panel {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 198px;
+	height: calc(100vh - 40px);
+	border: 1px solid white;
+	overflow: hidden;
+    margin: auto;
+    text-align: center;
 }
 
 div.map {
-  float: left;
-  position: relative;
-  top: 100px;
-  width: 64.5%;
-  height: calc(100vh - 120px);
-  border: 1px solid white;
+	position: absolute;
+	top: 150px;
+	left: 202px;
+	right: 202px;
+	margin: auto;
+	height: calc(100vh - 190px);
+	border: 1px solid white;
 }
 
-div.panel {
-  float: right;
-  position: relative;
-  top: 100px;
-  width: 34.5%;
-  height: calc(100vh - 120px);
-  border: 1px solid white;
+div.rh_panel {
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 198px;
+	height: calc(100vh - 40px);
+	border: 1px solid white;
+	overflow: hidden;
+}
+
+img.logo {
+	width: 100%;
+	margin: auto 0;
+}
+
+h1.title a {
+	display: block;
+	font-size: 1.1em;
+	margin-left: 20px;
+	text-transform: uppercase;
+	color: white;
+	text-shadow: #FFA500 1px 0 10px;
 }

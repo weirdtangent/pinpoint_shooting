@@ -1,12 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <script src="jquery-3.4.1.min.js"></script>
     <link rel="stylesheet" href="/css/main.css">
     <title>{{title}} - Pinpoint Shooting</title>
   </head>
 
   <body>
     <div class="header">
+    </div>
+
+    <div class="lh_panel">
+      <img class="logo" src="/img/profile_picture.png">
+
+      <button id="login">Login</button><br/><br/>
+      
+      <button id="create_user">Create Free Acount</button><br/>
+      <button id="create_from_flickr">Create Account Using Flickr</button><br/>
+      <button id="create_from_500px">Create Account Using 500px</button><br/>
     </div>
 
     <div id="map" class="map">
@@ -23,8 +34,7 @@
       async defer></script>
     </div>
 
-    <div class="panel">
-      <img src="/img/profile_picture.png" style="width: 50%; margin: auto 0;">
+    <div class="rh_panel">
     </div>
   </body>
 

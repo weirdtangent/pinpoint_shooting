@@ -2,8 +2,6 @@ extern crate diesel;
 extern crate ppslib;
 
 use self::diesel::prelude::*;
-use self::models::*;
-use self::ppslib::*;
 use ppslib::models::User;
 
 fn main() {

@@ -2,12 +2,11 @@
 
 #[macro_use]
 extern crate diesel;
-
+extern crate chrono;
 extern crate config;
 extern crate crypto;
-extern crate rand;
-extern crate chrono;
 extern crate dotenv;
+extern crate rand;
 extern crate rocket;
 extern crate rocket_contrib;
 extern crate serde;

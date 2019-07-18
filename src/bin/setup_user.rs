@@ -2,7 +2,7 @@ extern crate diesel;
 extern crate ppslib;
 
 use self::ppslib::*;
-use std::io::{stdin, Read};
+use std::io::stdin;
 
 fn main() {
     let connection = ppslib::setup_db();
