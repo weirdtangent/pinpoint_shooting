@@ -1,6 +1,16 @@
 [server]
 run_level = "staging"
 
+[logconfig]
+type = "file"
+format = "full"
+source_location = "module_and_line"
+timezone = "local"
+level = "debug"
+path = "log/error.log"
+rotate_size = 1073741824
+rotate_keep = 8
+
 [webservice]
 bind_address = "0.0.0.0"
 bind_port = 3000

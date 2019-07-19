@@ -57,3 +57,10 @@ h1.title a {
 	color: white;
 	text-shadow: #FFA500 1px 0 10px;
 }
+
+button {
+    font-size: 1.1em;
+    color: black;
+    background-color: #FFA500;
+    margin: 10px;
+}

@@ -9,35 +9,42 @@ extern crate dotenv;
 extern crate rand;
 extern crate rocket;
 extern crate rocket_contrib;
+extern crate rocket_slog;
 extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
+extern crate slog;
+extern crate sloggers;
 
 pub mod crypt;
+pub mod logging;
 pub mod models;
 pub mod routes;
 pub mod schema;
 pub mod settings;
 
-use log::warn;
-
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
+use slog::*;
+use sloggers::file::*;
+use sloggers::types::Severity;
+use sloggers::Build;
 
 use rocket::routes;
+use rocket_slog::SlogFairing;
 
 use rocket_contrib::helmet::SpaceHelmet;
 use rocket_contrib::serve::StaticFiles;
 use rocket_contrib::templates::Template;
 
+use logging::LOGGING;
 use settings::CONFIG;
 
 pub fn setup_logging() {
-    simple_logger::init_with_level(log::Level::Info)
-        .expect("Tried to start the logging system but it had already started");
+    let logger = &LOGGING.logger;
 
     let run_level = &CONFIG.server.run_level;
-    warn!("Running as run_level {}", run_level);
+    warn!(logger, "Service starting"; "run_level" => run_level);
 }
 
 pub fn setup_db() -> PgConnection {
@@ -45,17 +52,25 @@ pub fn setup_db() -> PgConnection {
 }
 
 pub fn start_webservice() {
+    let logger = &LOGGING.logger;
+
+    let weblog_path = &CONFIG.webservice.weblog_path;
     let bind_address = &CONFIG.webservice.bind_address;
     let bind_port = &CONFIG.webservice.bind_port;
 
     // start rocket webservice
     let version = include_str!("version.txt");
 
+    let mut builder = FileLoggerBuilder::new(weblog_path);
+    builder.level(Severity::Debug);
+    let weblogger = builder.build().unwrap();
+    let fairing = SlogFairing::new(weblogger);
+
     warn!(
-        "Listening on {}:{} as version {}",
-        bind_address, bind_port, version
-    );
+        logger,
+        "Waiting for connections..."; "address" => bind_address, "port" => bind_port, "version" => version);
     rocket::ignite()
+        .attach(fairing)
         .attach(Template::fairing())
         .attach(SpaceHelmet::default())
         .mount("/", routes![routes::index, routes::favicon])

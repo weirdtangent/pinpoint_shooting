@@ -2,6 +2,7 @@ use config::{Config, Environment, File};
 use dotenv::dotenv;
 use once_cell::sync::Lazy;
 use serde_derive::Deserialize;
+use sloggers::LoggerConfig;
 use std::env;
 
 #[derive(Debug, Deserialize)]
@@ -11,6 +12,7 @@ pub struct Server {
 
 #[derive(Debug, Deserialize)]
 pub struct WebService {
+    pub weblog_path: String,
     pub bind_address: String,
     pub bind_port: u16,
 }
@@ -21,6 +23,7 @@ pub struct Settings {
     pub webservice: WebService,
     pub database_url: String,
     pub google_maps_api_key: String,
+    pub logconfig: LoggerConfig,
 }
 
 pub static CONFIG: Lazy<Settings> = Lazy::new(|| {

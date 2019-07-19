@@ -1,6 +1,17 @@
 [server]
 run_level = "development"
 
+[logconfig]
+type = "file"
+format = "compact"
+source_location = "module_and_line"
+timezone = "local"
+level = "debug"
+path = "log/error.log"
+rotate_size = 1073741824
+rotate_keep = 2
+
 [webservice]
+weblog_path = "log/access.log"
 bind_address = "0.0.0.0"
 bind_port = 3000

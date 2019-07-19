@@ -3,7 +3,7 @@ address = "0.0.0.0"
 port = 3000
 workers = 4
 keep_alive = 5
-log = "normal"
+log = "off"
 limits = { forms = 32768 }
 template_dir = "./src/view/templates"
 
@@ -12,7 +12,7 @@ address = "0.0.0.0"
 port = 80
 workers = 8
 keep_alive = 5
-log = "normal"
+log = "off"
 limits = { forms = 32768 }
 template_dir = "./src/view/templates"
 
@@ -21,6 +21,6 @@ address = "0.0.0.0"
 port = 80
 workers = 16
 keep_alive = 5
-log = "critical"
+log = "off"
 limits = { forms = 32768 }
 template_dir = "./src/view/templates"
