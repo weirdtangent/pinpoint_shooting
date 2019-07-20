@@ -21,9 +21,6 @@ pub static LOGGING: Lazy<Logging> = Lazy::new(|| {
         .open(logfile)
         .unwrap();
 
-    //let decorator = slog_json::PlainDecorator::new(file);
-    //let drain = slog_json::CompactFormat::new(decorator).build().fuse();
-
     let applogger = slog::Logger::root(
         Mutex::new(slog_bunyan::default(file)).fuse(),
         o!("location" => FnValue(move |info| {
