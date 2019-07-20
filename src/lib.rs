@@ -13,9 +13,9 @@ extern crate rocket_slog;
 extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
+#[macro_use]
 extern crate slog;
 extern crate slog_bunyan;
-extern crate sloggers;
 
 pub mod crypt;
 pub mod logging;
@@ -24,12 +24,12 @@ pub mod routes;
 pub mod schema;
 pub mod settings;
 
+use std::fs::OpenOptions;
+use std::sync::Mutex;
+
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use slog::*;
-use sloggers::file::*;
-use sloggers::types::Severity;
-use sloggers::Build;
 
 use rocket::routes;
 use rocket_slog::SlogFairing;
@@ -42,10 +42,10 @@ use logging::LOGGING;
 use settings::CONFIG;
 
 pub fn setup_logging() {
-    let logger = &LOGGING.logger;
+    let applogger = &LOGGING.logger;
 
     let run_level = &CONFIG.server.run_level;
-    warn!(logger, "Service starting"; "run_level" => run_level);
+    warn!(applogger, "Service starting"; "run_level" => run_level);
 }
 
 pub fn setup_db() -> PgConnection {
@@ -53,23 +53,31 @@ pub fn setup_db() -> PgConnection {
 }
 
 pub fn start_webservice() {
-    let logger = &LOGGING.logger;
+    let applogger = &LOGGING.logger;
 
-    let weblog_path = &CONFIG.webservice.weblog_path;
-    let bind_address = &CONFIG.webservice.bind_address;
-    let bind_port = &CONFIG.webservice.bind_port;
+    // start weblogger with json logs
+    let logconfig = &CONFIG.logconfig;
+    let logfile = &logconfig.weblog_path;
+    let file = OpenOptions::new()
+        .create(true)
+        .write(true)
+        .truncate(true)
+        .open(logfile)
+        .unwrap();
 
-    // start rocket webservice
-    let version = include_str!("version.txt").trim_end_matches("\n");
+    let weblogger = slog::Logger::root(Mutex::new(slog_bunyan::default(file)).fuse(), o!());
 
-    let mut builder = FileLoggerBuilder::new(weblog_path);
-    builder.level(Severity::Debug);
-    let weblogger = builder.build().unwrap();
     let fairing = SlogFairing::new(weblogger);
 
+    let bind_address = &CONFIG.webservice.bind_address;
+    let bind_port = &CONFIG.webservice.bind_port;
+    let version = include_str!("version.txt").trim_end_matches("\n");
+
     warn!(
-        logger,
+        applogger,
         "Waiting for connections..."; "address" => bind_address, "port" => bind_port, "version" => version);
+
+    // start rocket webservice
     rocket::ignite()
         .attach(fairing)
         .attach(Template::fairing())
