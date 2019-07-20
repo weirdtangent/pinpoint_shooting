@@ -7,7 +7,7 @@ format = "full"
 source_location = "module_and_line"
 timezone = "local"
 level = "debug"
-path = "log/error.log"
+path = "log/app.log"
 rotate_size = 1073741824
 rotate_keep = 8
 

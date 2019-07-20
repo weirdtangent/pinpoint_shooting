@@ -14,6 +14,7 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
 extern crate slog;
+extern crate slog_bunyan;
 extern crate sloggers;
 
 pub mod crypt;
@@ -59,7 +60,7 @@ pub fn start_webservice() {
     let bind_port = &CONFIG.webservice.bind_port;
 
     // start rocket webservice
-    let version = include_str!("version.txt");
+    let version = include_str!("version.txt").trim_end_matches("\n");
 
     let mut builder = FileLoggerBuilder::new(weblog_path);
     builder.level(Severity::Debug);
