@@ -1,4 +1,4 @@
-use diesel::Queryable;
+use diesel::{Queryable, *};
 
 #[derive(Insertable, Queryable, Debug, PartialEq)]
 #[table_name = "users"]
@@ -17,7 +17,7 @@ pub struct User {
 }
 
 use super::schema::users;
- 
+
 #[derive(Insertable)]
 #[table_name = "users"]
 pub struct NewUser<'a> {

@@ -2,20 +2,6 @@
 
 #[macro_use]
 extern crate diesel;
-extern crate chrono;
-extern crate config;
-extern crate crypto;
-extern crate dotenv;
-extern crate rand;
-extern crate rocket;
-extern crate rocket_contrib;
-extern crate rocket_slog;
-extern crate serde;
-extern crate serde_derive;
-extern crate serde_json;
-#[macro_use]
-extern crate slog;
-extern crate slog_bunyan;
 
 pub mod crypt;
 pub mod logging;
@@ -87,28 +73,4 @@ pub fn start_webservice() {
         .mount("/css", StaticFiles::from("src/view/static/css"))
         .mount("/js", StaticFiles::from("src/view/static/js"))
         .launch();
-}
-
-use self::models::{NewUser, User};
-
-pub fn create_user<'a>(
-    connection: &PgConnection,
-    user_name: &'a str,
-    password: &'a str,
-    email: &'a str,
-    real_name: &'a str,
-) -> User {
-    use schema::users;
-
-    let new_user = NewUser {
-        user_name: user_name,
-        password: password,
-        email: email,
-        real_name: real_name,
-    };
-
-    diesel::insert_into(users::table)
-        .values(&new_user)
-        .get_result(connection)
-        .expect("Error saving new user")
 }

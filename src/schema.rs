@@ -1,3 +1,5 @@
+use diesel::*;
+
 table! {
     likes (like_id) {
         like_id -> Int4,
@@ -88,11 +90,4 @@ table! {
     }
 }
 
-allow_tables_to_appear_in_same_query!(
-    likes,
-    locations,
-    photos,
-    ratings,
-    users,
-    visits,
-);
+allow_tables_to_appear_in_same_query!(likes, locations, photos, ratings, users, visits,);
