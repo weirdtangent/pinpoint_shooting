@@ -1,6 +1,6 @@
 use crate::settings::CONFIG;
 use once_cell::sync::Lazy;
-use slog::{Drain, FnValue, *};
+use slog::{FnValue, *};
 use std::fs::OpenOptions;
 use std::sync::Mutex;
 

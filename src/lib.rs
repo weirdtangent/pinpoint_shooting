@@ -13,7 +13,6 @@ pub mod settings;
 use std::fs::OpenOptions;
 use std::sync::Mutex;
 
-use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use slog::*;
 
@@ -26,13 +25,6 @@ use rocket_contrib::templates::Template;
 
 use logging::LOGGING;
 use settings::CONFIG;
-
-pub fn setup_logging() {
-    let applogger = &LOGGING.logger;
-
-    let run_level = &CONFIG.server.run_level;
-    warn!(applogger, "Service starting"; "run_level" => run_level);
-}
 
 pub fn setup_db() -> PgConnection {
     PgConnection::establish(&CONFIG.database_url).expect(&format!("Error connecting to db"))
