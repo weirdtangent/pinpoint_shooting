@@ -4,8 +4,8 @@ run_level = "staging"
 [logconfig]
 level = "debug"
 applog_path = "log/app.log"
-weblog_path = "log/access.log"
+weblog_path = "log/rocket.log"
 
 [webservice]
-bind_address = "0.0.0.0"
+bind_address = "127.0.0.1"
 bind_port = 3000
