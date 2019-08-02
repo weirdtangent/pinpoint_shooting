@@ -1,6 +1,6 @@
 body {
-	background-color: #123d18;
-	color: white;
+	background-color: #000000;
+	color: #FFFFFF;
 }
 
 div.header {
@@ -9,16 +9,17 @@ div.header {
     left: 202px;
     right: 202px;
 	height: 148px;
-    background-color: white;
+    background-color: #000000;
 }
 
 div.lh_panel {
+	background-color: #123D18;
 	position: absolute;
 	top: 0;
 	left: 0;
 	width: 198px;
 	height: calc(100vh - 40px);
-	border: 1px solid white;
+	border: 1px solid #FFFFFF;
 	overflow: hidden;
     margin: auto;
     text-align: center;
@@ -31,16 +32,17 @@ div.map {
 	right: 202px;
 	margin: auto;
 	height: calc(100vh - 190px);
-	border: 1px solid white;
+	border: 1px solid #FFFFFF;
 }
 
 div.rh_panel {
+	background-color: #122D18;
 	position: absolute;
 	top: 0;
 	right: 0;
 	width: 198px;
 	height: calc(100vh - 40px);
-	border: 1px solid white;
+	border: 1px solid #FFFFFF;
 	overflow: hidden;
 }
 
@@ -54,7 +56,7 @@ h1.title a {
 	font-size: 1.1em;
 	margin-left: 20px;
 	text-transform: uppercase;
-	color: white;
+	color: #FFFFFF;
 	text-shadow: #FFA500 1px 0 10px;
 }
 

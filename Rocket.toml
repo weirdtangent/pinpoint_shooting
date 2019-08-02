@@ -6,6 +6,7 @@ keep_alive = 5
 log = "off"
 limits = { forms = 32768 }
 template_dir = "./src/view/templates"
+secret_key = "fGEan397xSQDx3yV+MHu77Futyo3s1XWFuQ8B/qS+VA="
 
 [staging]
 address = "127.0.0.1"
@@ -15,6 +16,7 @@ keep_alive = 5
 log = "off"
 limits = { forms = 32768 }
 template_dir = "./src/view/templates"
+secret_key = "rdDVf1lBYl5riUqhlfcKOBZWTx846NoaCUamacAwTRk="
 
 [production]
 address = "127.0.0.1"
@@ -24,3 +26,4 @@ keep_alive = 5
 log = "off"
 limits = { forms = 32768 }
 template_dir = "./src/view/templates"
+secret_key = "+Z7qZ80t0OX8JZa9zDpBxqiXRYOCRkHGJ6hE/qoJnlI="

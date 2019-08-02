@@ -14,11 +14,16 @@
     <div class="lh_panel">
       <a href="https://rust.graystorm.com/" target="_new"><img class="logo" src="/img/profile_picture.png"></a>
 
+      {{#if user_name}}
+      Welcome {{user_name}}<br/><br/>
+      <button id="logout">Logout</button><br/><br/>
+      {{else}}
       <button id="login">Login</button><br/><br/>
       
       <button id="create_user">Create Free Acount</button><br/>
       <button id="create_from_flickr">Create Account Using Flickr</button><br/>
       <button id="create_from_500px">Create Account Using 500px</button><br/>
+      {{/if}}
     </div>
 
     <div id="map" class="map">

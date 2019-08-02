@@ -29,8 +29,12 @@ serde_json = "1.0.40"
 once_cell = "0.2.2"
 dotenv = "0.14.1"
 chrono = "0.4.7"
-rocket = "0.4.2"
 rocket-slog = "0.4.0"
+sha2 = "0.8.0"
+
+[dependencies.rocket]
+version = "0.4.2"
+features = ["private-cookies"]
 
 [dependencies.diesel]
 version = "1.4.2"
