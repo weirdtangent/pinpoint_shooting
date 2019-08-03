@@ -1,6 +1,9 @@
 [server]
 run_level = "development"
 
+[sessions]
+expire = 60
+
 [logconfig]
 level = "debug"
 applog_path = "log/app.log"

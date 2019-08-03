@@ -18,20 +18,26 @@ use diesel::prelude::*;
 use slog::*;
 
 use rocket::routes;
-use rocket_slog::SlogFairing;
-
 use rocket_contrib::helmet::SpaceHelmet;
 use rocket_contrib::serve::StaticFiles;
 use rocket_contrib::templates::Template;
+use rocket_slog::SlogFairing;
+
+use rusoto_core::Region;
+use rusoto_dynamodb::DynamoDbClient;
 
 use logging::LOGGING;
 use settings::CONFIG;
 
-pub fn setup_db() -> PgConnection {
+pub fn connect_pgsql() -> PgConnection {
     PgConnection::establish(&CONFIG.database_url).expect(&format!("Error connecting to db"))
 }
 
-pub fn start_webservice() {
+pub fn connect_dynamodb() -> DynamoDbClient {
+    DynamoDbClient::new(Region::UsEast1)
+}
+
+pub fn start_application() {
     let applogger = &LOGGING.logger;
 
     // start weblogger with json logs

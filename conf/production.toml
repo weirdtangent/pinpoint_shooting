@@ -1,6 +1,9 @@
 [server]
 run_level = "production"
 
+[sessions]
+expire = 10080
+
 [logconfig]
 level = "debug"
 applog_path = "log/app.log"

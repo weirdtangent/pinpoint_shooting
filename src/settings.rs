@@ -1,12 +1,17 @@
 use config::{Config, Environment, File};
 use dotenv::dotenv;
 use once_cell::sync::Lazy;
-use serde_derive::Deserialize;
+use serde::Deserialize;
 use std::env;
 
 #[derive(Debug, Deserialize)]
 pub struct Server {
     pub run_level: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Sessions {
+    pub expire: i64,
 }
 
 #[derive(Debug, Deserialize)]
@@ -26,6 +31,7 @@ pub struct LogConfig {
 pub struct Settings {
     pub server: Server,
     pub webservice: WebService,
+    pub sessions: Sessions,
     pub database_url: String,
     pub google_maps_api_key: String,
     pub logconfig: LogConfig,

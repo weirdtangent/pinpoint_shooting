@@ -23,6 +23,5 @@ fn main() {
         &CONFIG.logconfig.weblog_path
     );
 
-    setup_db();
-    start_webservice();
+    start_application();
 }
