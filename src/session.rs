@@ -35,12 +35,7 @@ pub fn get_or_setup_session(cookies: &mut Cookies) -> Session {
         }
     }
 
-    // otherwise, start a new, empty session to use for this user
-    let mut hasher = Sha256::new();
-    let randstr: String = thread_rng().sample_iter(&Alphanumeric).take(256).collect();
-    hasher.input(randstr);
-    let sessid = format!("{:x}", hasher.result());
-
+    let sessid = get_new_session_id(&dynamodb);
     let sess_cookie = Cookie::build("sessid", sessid.clone())
         .path("/")
         .secure(true)
@@ -56,10 +51,36 @@ pub fn get_or_setup_session(cookies: &mut Cookies) -> Session {
     session
 }
 
+// otherwise, start a new, empty session to use for this user
+// and make sure the random sessid we pick isn't ALREADY in use
+fn get_new_session_id(dynamodb: &DynamoDbClient) -> String {
+    let mut sessid = String::new();
+    while sessid.is_empty() {
+        let mut hasher = Sha256::new();
+        let randstr: String = thread_rng().sample_iter(&Alphanumeric).take(256).collect();
+        hasher.input(randstr);
+        sessid = format!("{:x}", hasher.result());
+        if let Some(_) = verify_session_in_ddb(&dynamodb, &sessid) {
+            sessid = "".to_string();
+        }
+    }
+    sessid
+}
+
 // Search for sessid in dynamodb and verify session if found
 // including to see if it has expired
 fn verify_session_in_ddb(dynamodb: &DynamoDbClient, sessid: &String) -> Option<Session> {
     let applogger = &LOGGING.logger;
+
+    // sessid must be exactly 64 ascii bytes of [0-9a-f] (32 bytes expressed as hex)
+    if sessid.len() != 64 || !sessid.is_ascii() {
+        warn!(applogger, "sessid wrong length"; "length" => sessid.len());
+        return None;
+    }
+    if !sessid.chars().all(|c| c.is_ascii_hexdigit()) {
+        warn!(applogger, "sessid not only ascii hexdigits"; "sessid" => sessid);
+        return None;
+    }
 
     let av = AttributeValue {
         s: Some(sessid.clone()),
