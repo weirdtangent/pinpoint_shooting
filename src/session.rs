@@ -41,7 +41,11 @@ pub fn get_or_setup_session(cookies: &mut Cookies) -> Session {
     hasher.input(randstr);
     let sessid = format!("{:x}", hasher.result());
 
-    cookies.add_private(Cookie::new("sessid", sessid.clone()));
+    let sess_cookie = Cookie::build("sessid", sessid.clone())
+        .path("/")
+        .secure(true)
+        .finish();
+    cookies.add_private(sess_cookie);
 
     let mut session = Session {
         sessid: sessid.clone(),
@@ -80,6 +84,7 @@ fn verify_session_in_ddb(dynamodb: &DynamoDbClient, sessid: &String) -> Option<S
                         match session.last_access {
                             Some(last) => {
                                 if last > Utc::now() - Duration::minutes(CONFIG.sessions.expire) {
+                                    debug!(applogger, "Session verified"; "sessid" => sessid);
                                     Some(session)
                                 } else {
                                     debug!(applogger, "Session expired"; "sessid" => sessid);
