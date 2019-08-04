@@ -40,12 +40,13 @@ pub struct Settings {
 pub static CONFIG: Lazy<Settings> = Lazy::new(|| {
     dotenv().ok();
     let mut config = Config::default();
-    let env = env::var("PPS_RUN_MODE").unwrap_or("development".into());
+    let run_level = env::var("PPS_RUN_MODE").unwrap_or("development".into());
+    println!("Reading conf/{}.toml", run_level);
 
     config
         .merge(File::with_name("conf/default"))
         .unwrap()
-        .merge(File::with_name(&format!("conf/{}", env)).required(false))
+        .merge(File::with_name(&format!("conf/{}", run_level)).required(false))
         .unwrap()
         .merge(File::with_name("conf/local").required(false))
         .unwrap()

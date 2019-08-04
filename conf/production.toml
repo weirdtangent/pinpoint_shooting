@@ -5,10 +5,10 @@ run_level = "production"
 expire = 10080
 
 [logconfig]
-level = "debug"
+level = "info"
 applog_path = "log/app.log"
 weblog_path = "log/rocket.log"
 
 [webservice]
 bind_address = "127.0.0.1"
-bind_port = 80
+bind_port = 3000

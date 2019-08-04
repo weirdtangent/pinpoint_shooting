@@ -20,11 +20,16 @@ pub static LOGGING: Lazy<Logging> = Lazy::new(|| {
         .open(logfile)
         .unwrap();
 
-    let applogger = slog::Logger::root(
-        Mutex::new(slog_bunyan::default(file)).fuse(),
+    let filter_level = &logconfig.level;
+    let filter_level = filter_level
+        .parse::<Level>()
+        .expect("Invalid log level filter");
+
+    let applogger = Logger::root(
+        Mutex::new(LevelFilter::new(slog_bunyan::default(file), filter_level)).fuse(),
         o!("location" => FnValue(move |info| {
-        format!("{}:{} {}", info.file(), info.line(), info.module())
-                })
+            format!("{}:{} {}", info.file(), info.line(), info.module())
+            })
         ),
     );
 
