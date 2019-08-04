@@ -17,17 +17,19 @@ pub struct Session {
     pub last_access: Option<DateTime<Utc>>,
 }
 
+// Check for sessid cookie and verify session or create new
+// session to use - either way, return the session struct
 pub fn get_or_setup_session(cookies: &mut Cookies) -> Session {
+    let applogger = &LOGGING.logger;
     let dynamodb = connect_dynamodb();
 
     // if we can pull sessid from cookies and validate it,
     // pull session from cache or from storage and return
     if let Some(cookie) = cookies.get_private("sessid") {
-        println!("Cookie: {} ... verifying", cookie.value());
+        info!(applogger, "Cookie found, verifying"; "sessid" => cookie.value());
 
-        // verify from dynamodb
+        // verify from dynamodb, update session with last-access if good
         if let Some(mut session) = verify_session_in_ddb(&dynamodb, &cookie.value().to_string()) {
-            println!("Cookie verified from ddb: {:?}", session);
             save_session_to_ddb(&dynamodb, &mut session);
             return session;
         }
@@ -50,6 +52,8 @@ pub fn get_or_setup_session(cookies: &mut Cookies) -> Session {
     session
 }
 
+// Search for sessid in dynamodb and verify session if found
+// including to see if it has expired
 fn verify_session_in_ddb(dynamodb: &DynamoDbClient, sessid: &String) -> Option<Session> {
     let applogger = &LOGGING.logger;
 
@@ -74,12 +78,12 @@ fn verify_session_in_ddb(dynamodb: &DynamoDbClient, sessid: &String) -> Option<S
                     Some(string) => {
                         let session: Session = serde_json::from_str(&string).unwrap();
                         match session.last_access {
-                            Some(l) => {
-                                if l > Utc::now() - Duration::minutes(CONFIG.sessions.expire) {
-                                    return Some(session);
+                            Some(last) => {
+                                if last > Utc::now() - Duration::minutes(CONFIG.sessions.expire) {
+                                    Some(session)
                                 } else {
-                                    println!("Session expired.");
-                                    return None;
+                                    info!(applogger, "Session expired"; "sessid" => sessid);
+                                    None
                                 }
                             }
                             None => {
@@ -110,7 +114,10 @@ fn verify_session_in_ddb(dynamodb: &DynamoDbClient, sessid: &String) -> Option<S
     }
 }
 
+// Write current session to dynamodb, update last-access date/time too
 fn save_session_to_ddb(dynamodb: &DynamoDbClient, session: &mut Session) {
+    let applogger = &LOGGING.logger;
+
     session.last_access = Some(Utc::now());
 
     let sessid_av = AttributeValue {
@@ -131,8 +138,11 @@ fn save_session_to_ddb(dynamodb: &DynamoDbClient, session: &mut Session) {
         ..Default::default()
     };
 
-    dynamodb
-        .put_item(put_item_input)
-        .sync()
-        .expect("Error in dynamodb");
+    match dynamodb.put_item(put_item_input).sync() {
+        Ok(_) => {}
+        Err(e) => {
+            crit!(applogger, "Error in dynamodb"; "err" => e.to_string());
+            panic!("Error in dynamodb: {}", e.to_string());
+        }
+    };
 }

@@ -16,14 +16,14 @@ pub static LOGGING: Lazy<Logging> = Lazy::new(|| {
     let file = OpenOptions::new()
         .create(true)
         .write(true)
-        .truncate(true)
+        .append(true)
         .open(logfile)
         .unwrap();
 
     let applogger = slog::Logger::root(
         Mutex::new(slog_bunyan::default(file)).fuse(),
         o!("location" => FnValue(move |info| {
-        format!("{}:{} {}", info.file(), info.line(), info.module(), )
+        format!("{}:{} {}", info.file(), info.line(), info.module())
                 })
         ),
     );

@@ -11,6 +11,9 @@ pub mod schema;
 pub mod session;
 pub mod settings;
 
+#[cfg(test)]
+mod tests;
+
 use std::fs::OpenOptions;
 use std::sync::Mutex;
 
@@ -37,7 +40,7 @@ pub fn connect_dynamodb() -> DynamoDbClient {
     DynamoDbClient::new(Region::UsEast1)
 }
 
-pub fn start_application() {
+pub fn rocket_prep() -> rocket::Rocket {
     let applogger = &LOGGING.logger;
 
     // start weblogger with json logs
@@ -62,8 +65,8 @@ pub fn start_application() {
         applogger,
         "Waiting for connections..."; "address" => bind_address, "port" => bind_port, "version" => version);
 
-    // start rocket webservice
-    let err = rocket::ignite()
+    // init rocket webservice
+    rocket::ignite()
         .attach(fairing)
         .attach(Template::fairing())
         .attach(SpaceHelmet::default())
@@ -71,7 +74,10 @@ pub fn start_application() {
         .mount("/img", StaticFiles::from("src/view/static/img"))
         .mount("/css", StaticFiles::from("src/view/static/css"))
         .mount("/js", StaticFiles::from("src/view/static/js"))
-        .launch();
+}
+
+pub fn start_application() {
+    let err = rocket_prep().launch();
 
     println!("Error, Rocket failed to init: {}", err);
 }
