@@ -17,7 +17,10 @@ fn main() {
         "Setting up to listen on {}:{}",
         &CONFIG.webservice.bind_address, &CONFIG.webservice.bind_port
     );
-    println!("Application logging to {}", &CONFIG.logconfig.applog_path);
+    println!(
+        "Application logging to {} at level {}",
+        &CONFIG.logconfig.applog_path, &CONFIG.logconfig.level
+    );
     println!(
         "Rocket framework logging to {}",
         &CONFIG.logconfig.weblog_path

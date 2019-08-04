@@ -5,7 +5,7 @@ run_level = "development"
 expire = 60
 
 [logconfig]
-level = "trace"
+level = "debug"
 applog_path = "log/app.log"
 weblog_path = "log/rocket.log"
 
