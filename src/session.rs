@@ -1,7 +1,7 @@
 use chrono::prelude::*;
 use rand::{distributions::Alphanumeric, thread_rng, Rng};
 use rocket::http::{Cookie, Cookies};
-use rusoto_dynamodb::{AttributeValue, DynamoDb, GetItemInput, PutItemInput};
+use rusoto_dynamodb::{AttributeValue, DeleteItemInput, DynamoDb, GetItemInput, PutItemInput};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::HashMap;
@@ -26,7 +26,7 @@ pub fn get_or_setup_session(cookies: &mut Cookies) -> Session {
     // if we can pull sessid from cookies and validate it,
     // pull session from cache or from storage and return
     if let Some(cookie) = cookies.get_private("sessid") {
-        info!(applogger, "Cookie found, verifying"; "sessid" => cookie.value());
+        debug!(applogger, "Cookie found, verifying"; "sessid" => cookie.value());
 
         // verify from dynamodb, update session with last-access if good
         if let Some(mut session) = verify_session_in_ddb(&dynamodb, &cookie.value().to_string()) {
@@ -82,28 +82,32 @@ fn verify_session_in_ddb(dynamodb: &DynamoDbClient, sessid: &String) -> Option<S
                                 if last > Utc::now() - Duration::minutes(CONFIG.sessions.expire) {
                                     Some(session)
                                 } else {
-                                    info!(applogger, "Session expired"; "sessid" => sessid);
+                                    debug!(applogger, "Session expired"; "sessid" => sessid);
+                                    delete_session_in_ddb(dynamodb, sessid);
                                     None
                                 }
                             }
                             None => {
-                                warn!(applogger, "'last_access' is blank for stored session"; "sessid" => sessid);
+                                debug!(applogger, "'last_access' is blank for stored session"; "sessid" => sessid);
+                                delete_session_in_ddb(dynamodb, sessid);
                                 None
                             }
                         }
                     }
                     None => {
-                        warn!(applogger, "'session' attribute is empty for stored session"; "sessid" => sessid);
+                        debug!(applogger, "'session' attribute is empty for stored session"; "sessid" => sessid);
+                        delete_session_in_ddb(dynamodb, sessid);
                         None
                     }
                 },
                 None => {
-                    warn!(applogger, "No 'session' attribute found for stored session"; "sessid" => sessid);
+                    debug!(applogger, "No 'session' attribute found for stored session"; "sessid" => sessid);
+                    delete_session_in_ddb(dynamodb, sessid);
                     None
                 }
             },
             None => {
-                warn!(applogger, "Session not found in dynamodb"; "sessid" => sessid);
+                debug!(applogger, "Session not found in dynamodb"; "sessid" => sessid);
                 None
             }
         },
@@ -140,6 +144,35 @@ fn save_session_to_ddb(dynamodb: &DynamoDbClient, session: &mut Session) {
 
     match dynamodb.put_item(put_item_input).sync() {
         Ok(_) => {}
+        Err(e) => {
+            crit!(applogger, "Error in dynamodb"; "err" => e.to_string());
+            panic!("Error in dynamodb: {}", e.to_string());
+        }
+    };
+}
+
+// Delete session from dynamodb
+fn delete_session_in_ddb(dynamodb: &DynamoDbClient, sessid: &String) {
+    let applogger = &LOGGING.logger;
+
+    let av = AttributeValue {
+        s: Some(sessid.clone()),
+        ..Default::default()
+    };
+
+    let mut key = HashMap::new();
+    key.insert("sessid".to_string(), av);
+
+    let delete_item_input = DeleteItemInput {
+        table_name: "session".to_string(),
+        key: key,
+        ..Default::default()
+    };
+
+    match dynamodb.delete_item(delete_item_input).sync() {
+        Ok(_) => {
+            debug!(applogger, "Deleted invalid session from ddb"; "sessid" => sessid);
+        }
         Err(e) => {
             crit!(applogger, "Error in dynamodb"; "err" => e.to_string());
             panic!("Error in dynamodb: {}", e.to_string());
