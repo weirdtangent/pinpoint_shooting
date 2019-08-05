@@ -7,11 +7,13 @@ use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use time::Duration;
 
+use crate::routes::Nginx;
 use crate::*;
 
 #[derive(Default, Debug, Deserialize, Serialize)]
 pub struct Session {
     pub sessid: String,
+    pub user_agent: String,
     pub user_id: Option<u32>,
     pub user_name: Option<String>,
     pub last_access: Option<DateTime<Utc>>,
@@ -19,7 +21,7 @@ pub struct Session {
 
 // Check for sessid cookie and verify session or create new
 // session to use - either way, return the session struct
-pub fn get_or_setup_session(cookies: &mut Cookies) -> Session {
+pub fn get_or_setup_session(cookies: &mut Cookies, nginx: &Nginx) -> Session {
     let applogger = &LOGGING.logger;
     let dynamodb = connect_dynamodb();
 
@@ -29,13 +31,15 @@ pub fn get_or_setup_session(cookies: &mut Cookies) -> Session {
         debug!(applogger, "Cookie found, verifying"; "sessid" => cookie.value());
 
         // verify from dynamodb, update session with last-access if good
-        if let Some(mut session) = verify_session_in_ddb(&dynamodb, &cookie.value().to_string()) {
-            save_session_to_ddb(&dynamodb, &mut session);
+        if let Some(mut session) =
+            verify_session_in_ddb(&dynamodb, &cookie.value().to_string(), &nginx)
+        {
+            save_session_to_ddb(&dynamodb, &mut session, &nginx);
             return session;
         }
     }
 
-    let sessid = get_new_session_id(&dynamodb);
+    let sessid = get_new_session_id(&dynamodb, &nginx);
     let sess_cookie = Cookie::build("sessid", sessid.clone())
         .path("/")
         .secure(true)
@@ -47,20 +51,23 @@ pub fn get_or_setup_session(cookies: &mut Cookies) -> Session {
         ..Default::default()
     };
 
-    save_session_to_ddb(&dynamodb, &mut session);
+    save_session_to_ddb(&dynamodb, &mut session, &nginx);
     session
 }
 
 // otherwise, start a new, empty session to use for this user
 // and make sure the random sessid we pick isn't ALREADY in use
-fn get_new_session_id(dynamodb: &DynamoDbClient) -> String {
+fn get_new_session_id(dynamodb: &DynamoDbClient, nginx: &Nginx) -> String {
     let mut sessid = String::new();
     while sessid.is_empty() {
         let mut hasher = Sha256::new();
-        let randstr: String = thread_rng().sample_iter(&Alphanumeric).take(256).collect();
-        hasher.input(randstr);
+        let randstr: String = thread_rng()
+            .sample_iter(&Alphanumeric)
+            .take(256)
+            .collect::<String>();
+        hasher.input(nginx.x_user_agent.clone() + &randstr);
         sessid = format!("{:x}", hasher.result());
-        if let Some(_) = verify_session_in_ddb(&dynamodb, &sessid) {
+        if let Some(_) = verify_session_in_ddb(&dynamodb, &sessid, &nginx) {
             sessid = "".to_string();
         }
     }
@@ -69,7 +76,11 @@ fn get_new_session_id(dynamodb: &DynamoDbClient) -> String {
 
 // Search for sessid in dynamodb and verify session if found
 // including to see if it has expired
-fn verify_session_in_ddb(dynamodb: &DynamoDbClient, sessid: &String) -> Option<Session> {
+fn verify_session_in_ddb(
+    dynamodb: &DynamoDbClient,
+    sessid: &String,
+    nginx: &Nginx,
+) -> Option<Session> {
     let applogger = &LOGGING.logger;
 
     // sessid must be exactly 64 ascii bytes of [0-9a-f] (32 bytes expressed as hex)
@@ -102,18 +113,20 @@ fn verify_session_in_ddb(dynamodb: &DynamoDbClient, sessid: &String) -> Option<S
                 Some(session) => match &session.s {
                     Some(string) => {
                         let session: Session = serde_json::from_str(&string).unwrap();
-                        match session.last_access {
-                            Some(last) => {
-                                if last > Utc::now() - Duration::minutes(CONFIG.sessions.expire) {
+                        match (session.last_access, &session.user_agent) {
+                            (Some(last), ua) => {
+                                if last > Utc::now() - Duration::minutes(CONFIG.sessions.expire)
+                                    && *ua == nginx.x_user_agent
+                                {
                                     debug!(applogger, "Session verified"; "sessid" => sessid);
                                     Some(session)
                                 } else {
-                                    debug!(applogger, "Session expired"; "sessid" => sessid);
+                                    debug!(applogger, "Session expired or user_agent does not match"; "sessid" => sessid);
                                     delete_session_in_ddb(dynamodb, sessid);
                                     None
                                 }
                             }
-                            None => {
+                            (None, _) => {
                                 debug!(applogger, "'last_access' is blank for stored session"; "sessid" => sessid);
                                 delete_session_in_ddb(dynamodb, sessid);
                                 None
@@ -145,10 +158,11 @@ fn verify_session_in_ddb(dynamodb: &DynamoDbClient, sessid: &String) -> Option<S
 }
 
 // Write current session to dynamodb, update last-access date/time too
-fn save_session_to_ddb(dynamodb: &DynamoDbClient, session: &mut Session) {
+fn save_session_to_ddb(dynamodb: &DynamoDbClient, session: &mut Session, nginx: &Nginx) {
     let applogger = &LOGGING.logger;
 
     session.last_access = Some(Utc::now());
+    session.user_agent = nginx.x_user_agent.clone();
 
     let sessid_av = AttributeValue {
         s: Some(session.sessid.clone()),
