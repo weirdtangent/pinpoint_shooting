@@ -1,9 +1,9 @@
 <script>
-  var profile;
-  function onSignIn(googleUser) {
-    profile = googleUser.getBasicProfile();
 
-    // set display items
+  // Google OAuth
+  function onSignIn(googleUser) {
+    var profile = googleUser.getBasicProfile();
+
     $('.profile_name').text(profile.getName());
     $('.profile_email').text(profile.getEmail());
     $('.profile_image').html($("<img>").attr("src", profile.getImageUrl()));
@@ -17,11 +17,11 @@
     xhr.open('POST', '/api/v1/tokensignin');
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     xhr.onload = function() {
-      if (xhr.responseText === 'error') {
+      if (xhr.responseText != 'success') {
         window.location.replace("/");
       }
     };
-    xhr.send('idtoken=' + id_token);
+    xhr.send('g_token=' + id_token);
   }
 
   function signOut() {
@@ -29,6 +29,37 @@
     auth2.signOut().then(function () {
       $('.js_logged_in').hide();
       $('.js_logged_out').show();
+    });
+  }
+
+  // Facebook OAuth
+  function statusChangeCallback(response) {
+    if (response.status === 'connected') {
+      FB.api('/me?fields=name,email', function(response) {
+      console.log(response);
+        $('.profile_name').text(response.name);
+        $('.profile_email').text(response.email);
+        $('.profile_image').html($("<img>").attr("src", 'https://graph.facebook.com/' + response.id + '/picture?type=normal'));
+      });
+
+      $('.js_logged_in').show();
+      $('.js_logged_out').hide();
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/v1/tokensignin');
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      xhr.onload = function() {
+        if (xhr.responseText != 'success') {
+          window.location.replace("/");
+        }
+      };
+      xhr.send('fb_token=' + response.authResponse.userID);
+    }
+  }
+
+  function checkLoginState() {
+    FB.getLoginStatus(function(response) {
+      statusChangeCallback(response);
     });
   }
 </script>

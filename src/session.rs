@@ -13,11 +13,12 @@ use crate::*;
 #[derive(Default, Debug, Deserialize, Serialize)]
 pub struct Session {
     pub sessid: String,
+    pub google_sub: Option<String>,
+    pub fb_sub: Option<String>,
     pub user_agent: String,
     pub user_id: Option<u32>,
     pub user_name: Option<String>,
     pub last_access: Option<DateTime<Utc>>,
-    pub google_sub: Option<String>,
 }
 
 impl Session {
@@ -25,6 +26,15 @@ impl Session {
         match &self.google_sub {
             None => {
                 self.google_sub = Some(sub.clone());
+                true
+            }
+            Some(cur) => *cur == *sub,
+        }
+    }
+    pub fn verify_or_save_fb_sub(&mut self, sub: &String) -> bool {
+        match &self.fb_sub {
+            None => {
+                self.fb_sub = Some(sub.clone());
                 true
             }
             Some(cur) => *cur == *sub,

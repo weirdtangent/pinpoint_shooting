@@ -4,14 +4,16 @@
     {{> includes/_googleanalytics}}
     {{> includes/_jquery}}
     {{> includes/_googleplatform}}
+    {{> includes/_facebooksdk}}
     {{> includes/_index}}
     <link rel="stylesheet" href="/css/main.css">
     <title>{{title}} - Pinpoint Shooting</title>
   </head>
 
   <body>
+    <div id="fb-root"></div>
     <div class="header">
-      <div class="js_logged_in" style="display:none;width:100px;text-align:center;">
+      <div class="js_logged_in" style="display:none;width:100px;height:123px;text-align:center;">
         <div class="profile_image"></div>
         <button onClick="signOut();">logout</a>
       </div>
@@ -21,6 +23,12 @@
       <a href="https://rust.graystorm.com/" target="_new"><img class="logo" src="/img/profile_picture.png"></a>
       <div class="js_logged_out" style="text-align: center">
         <div style="display: inline-block;" class="g-signin2" data-onsuccess="onSignIn"></div>
+        <div style="display: inline-block;">
+          <fb:login-button 
+            scope="public_profile,email"
+              onlogin="checkLoginState();">
+          </fb:login-button>
+        </div>
       </div>
     </div>
 
