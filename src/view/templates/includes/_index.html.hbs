@@ -1,0 +1,22 @@
+<script>
+  var profile;
+  function onSignIn(googleUser) {
+    profile = googleUser.getBasicProfile();
+
+    // set display items
+    $('.profile_name').text(profile.getName());
+    $('.profile_email').text(profile.getEmail());
+    $('.profile_image').html($("<img>").attr("src", profile.getImageUrl()));
+
+    $('.js_logged_in').show();
+    $('.js_logged_out').hide();
+  }
+
+  function signOut() {
+    var auth2 = gapi.auth2.getAuthInstance();
+    auth2.signOut().then(function () {
+      $('.js_logged_in').hide();
+      $('.js_logged_out').show();
+    });
+  }
+</script>

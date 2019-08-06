@@ -61,8 +61,16 @@ h1.title a {
 }
 
 button {
-    font-size: 1.1em;
+    font-size: .8em;
+    font-family: Arial;
     color: black;
     background-color: #FFA500;
-    margin: 10px;
+    border-radius: 8px;
+    padding: 2px 20px;
+}
+
+div.profile_image {
+    margin: 4px 2px;
+    width: 96px;
+    height: 96px;
 }
