@@ -8,8 +8,20 @@
     $('.profile_email').text(profile.getEmail());
     $('.profile_image').html($("<img>").attr("src", profile.getImageUrl()));
 
+    var id_token = googleUser.getAuthResponse().id_token;
+
     $('.js_logged_in').show();
     $('.js_logged_out').hide();
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/v1/tokensignin');
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.onload = function() {
+      if (xhr.responseText === 'error') {
+        window.location.replace("/");
+      }
+    };
+    xhr.send('idtoken=' + id_token);
   }
 
   function signOut() {

@@ -33,8 +33,10 @@ pub struct Settings {
     pub webservice: WebService,
     pub sessions: Sessions,
     pub database_url: String,
-    pub google_maps_api_key: String,
     pub logconfig: LogConfig,
+    pub google_api_client_id: String,
+    pub google_api_client_secret: String,
+    pub google_maps_api_key: String,
 }
 
 pub static CONFIG: Lazy<Settings> = Lazy::new(|| {

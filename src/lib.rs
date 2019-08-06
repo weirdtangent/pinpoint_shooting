@@ -3,6 +3,7 @@
 #[macro_use]
 extern crate diesel;
 
+pub mod api;
 pub mod crypt;
 pub mod logging;
 pub mod models;
@@ -70,7 +71,10 @@ pub fn rocket_prep() -> rocket::Rocket {
         .attach(fairing)
         .attach(Template::fairing())
         .attach(SpaceHelmet::default())
-        .mount("/", routes![routes::favicon, routes::index])
+        .mount(
+            "/",
+            routes![routes::favicon, routes::index, api::tokensignin],
+        )
         .mount("/img", StaticFiles::from("src/view/static/img"))
         .mount("/css", StaticFiles::from("src/view/static/css"))
         .mount("/js", StaticFiles::from("src/view/static/js"))

@@ -17,6 +17,19 @@ pub struct Session {
     pub user_id: Option<u32>,
     pub user_name: Option<String>,
     pub last_access: Option<DateTime<Utc>>,
+    pub google_sub: Option<String>,
+}
+
+impl Session {
+    pub fn verify_or_save_google_sub(&mut self, sub: &String) -> bool {
+        match &self.google_sub {
+            None => {
+                self.google_sub = Some(sub.clone());
+                true
+            }
+            Some(cur) => *cur == *sub,
+        }
+    }
 }
 
 // Check for sessid cookie and verify session or create new
@@ -34,24 +47,32 @@ pub fn get_or_setup_session(cookies: &mut Cookies, nginx: &Nginx) -> Session {
         if let Some(mut session) =
             verify_session_in_ddb(&dynamodb, &cookie.value().to_string(), &nginx)
         {
-            save_session_to_ddb(&dynamodb, &mut session, &nginx);
+            save_session_to_ddb(&dynamodb, &mut session);
             return session;
         }
     }
 
-    let sessid = get_new_session_id(&dynamodb, &nginx);
-    let sess_cookie = Cookie::build("sessid", sessid.clone())
+    let session = create_new_session(&nginx);
+    let sess_cookie = Cookie::build("sessid", session.sessid.clone())
         .path("/")
         .secure(true)
         .finish();
     cookies.add_private(sess_cookie);
 
+    session
+}
+
+pub fn create_new_session(nginx: &Nginx) -> Session {
+    let dynamodb = connect_dynamodb();
+
+    let sessid = get_new_session_id(&dynamodb, &nginx);
+
     let mut session = Session {
         sessid: sessid.clone(),
+        user_agent: nginx.x_user_agent.clone(),
         ..Default::default()
     };
-
-    save_session_to_ddb(&dynamodb, &mut session, &nginx);
+    save_session_to_ddb(&dynamodb, &mut session);
     session
 }
 
@@ -158,11 +179,10 @@ fn verify_session_in_ddb(
 }
 
 // Write current session to dynamodb, update last-access date/time too
-fn save_session_to_ddb(dynamodb: &DynamoDbClient, session: &mut Session, nginx: &Nginx) {
+pub fn save_session_to_ddb(dynamodb: &DynamoDbClient, session: &mut Session) {
     let applogger = &LOGGING.logger;
 
     session.last_access = Some(Utc::now());
-    session.user_agent = nginx.x_user_agent.clone();
 
     let sessid_av = AttributeValue {
         s: Some(session.sessid.clone()),
@@ -191,8 +211,7 @@ fn save_session_to_ddb(dynamodb: &DynamoDbClient, session: &mut Session, nginx: 
     };
 }
 
-// Delete session from dynamodb
-fn delete_session_in_ddb(dynamodb: &DynamoDbClient, sessid: &String) {
+pub fn delete_session_in_ddb(dynamodb: &DynamoDbClient, sessid: &String) {
     let applogger = &LOGGING.logger;
 
     let av = AttributeValue {
