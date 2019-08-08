@@ -6,11 +6,13 @@ extern crate diesel;
 pub mod api;
 pub mod crypt;
 pub mod logging;
-pub mod models;
+pub mod model;
+pub mod oauth;
 pub mod routes;
 pub mod schema;
 pub mod session;
 pub mod settings;
+pub mod shooter;
 
 #[cfg(test)]
 mod tests;

@@ -1,46 +1,45 @@
 use rocket::{http::Cookies, post, request::Form, FromForm};
 
+use crate::oauth::*;
 use crate::routes::Nginx;
 use crate::session::*;
-use crate::settings::CONFIG;
-use crate::*;
 
 #[derive(FromForm)]
-pub struct OAuthToken {
-    pub g_token: Option<String>,
-    pub fb_token: Option<String>,
+pub struct OAuthReq {
+    pub g_token: Option<String>,  // google login req
+    pub fb_token: Option<String>, // facebook login req`
+    pub name: String,
+    pub email: String,
 }
 
-#[post("/api/v1/tokensignin", data = "<oauth_token>")]
-pub fn tokensignin(mut cookies: Cookies, nginx: Nginx, oauth_token: Form<OAuthToken>) -> String {
-    let dynamodb = connect_dynamodb();
+#[post("/api/v1/tokensignin", data = "<oauth_req>")]
+pub fn tokensignin(mut cookies: Cookies, nginx: Nginx, oauth_req: Form<OAuthReq>) -> String {
     let mut session = get_or_setup_session(&mut cookies, &nginx);
 
-    if let Some(g) = &oauth_token.g_token {
-        let mut google = google_signin::Client::new();
-        google.audiences.push(CONFIG.google_api_client_id.clone());
-
-        let id_info = google.verify(&g).expect("Expected token to be valid");
-
-        match session.verify_or_save_google_sub(&id_info.sub) {
+    if let Some(token) = &oauth_req.g_token {
+        match verify_google_oauth(&mut session, &token, &oauth_req.name, &oauth_req.email) {
             true => {
-                save_session_to_ddb(&dynamodb, &mut session);
+                session.google_oauth = true;
+                save_session_to_ddb(&mut session);
                 "success".to_string()
             }
             false => {
-                delete_session_in_ddb(&dynamodb, &session.sessid);
-                "mismatch".to_string()
+                session.google_oauth = false;
+                save_session_to_ddb(&mut session);
+                "failed".to_string()
             }
         }
-    } else if let Some(fb) = &oauth_token.fb_token {
-        match session.verify_or_save_fb_sub(&fb) {
+    } else if let Some(token) = &oauth_req.fb_token {
+        match verify_facebook_oauth(&mut session, &token, &oauth_req.name, &oauth_req.email) {
             true => {
-                save_session_to_ddb(&dynamodb, &mut session);
+                session.facebook_oauth = true;
+                save_session_to_ddb(&mut session);
                 "success".to_string()
             }
             false => {
-                delete_session_in_ddb(&dynamodb, &session.sessid);
-                "mismatch".to_string()
+                session.facebook_oauth = false;
+                save_session_to_ddb(&mut session);
+                "failed".to_string()
             }
         }
     } else {

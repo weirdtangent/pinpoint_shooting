@@ -45,11 +45,11 @@ features = ["derive"]
 version = "0.4.2"
 features = ["private-cookies"]
 
-[dependencies.diesel]
-version = "1.4.2"
-features = ["postgres","chrono"]
-
 [dependencies.rocket_contrib]
 version = "0.4.2"
 default-features = false
 features = ["serve","handlebars_templates","helmet","json"]
+
+[dependencies.diesel]
+version = "1.4.2"
+features = ["postgres","chrono"]

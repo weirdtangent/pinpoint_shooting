@@ -1,4 +1,5 @@
 <script>
+  var tokenSignInCount = 0;
 
   // Google OAuth
   function onSignIn(googleUser) {
@@ -13,15 +14,7 @@
     $('.js_logged_in').show();
     $('.js_logged_out').hide();
 
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/api/v1/tokensignin');
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.onload = function() {
-      if (xhr.responseText != 'success') {
-        window.location.replace("/");
-      }
-    };
-    xhr.send('g_token=' + id_token);
+    tokenSignIn('g_token',id_token,profile.getName(),profile.getEmail());
   }
 
   function signOut() {
@@ -31,29 +24,21 @@
       $('.js_logged_out').show();
     });
   }
+  // --------------------------------------------------------------------------
 
   // Facebook OAuth
   function statusChangeCallback(response) {
     if (response.status === 'connected') {
-      FB.api('/me?fields=name,email', function(response) {
-      console.log(response);
-        $('.profile_name').text(response.name);
-        $('.profile_email').text(response.email);
-        $('.profile_image').html($("<img>").attr("src", 'https://graph.facebook.com/' + response.id + '/picture?type=normal'));
+      FB.api('/me?fields=name,email', function(me_response) {
+        $('.profile_name').text(me_response.name);
+        $('.profile_email').text(me_response.email);
+        $('.profile_image').html($("<img>").attr("src", 'https://graph.facebook.com/' + me_response.id + '/picture?type=normal'));
+
+        tokenSignIn('fb_token',response.authResponse.userID,me_response.name,me_response.email);
       });
 
       $('.js_logged_in').show();
       $('.js_logged_out').hide();
-
-      var xhr = new XMLHttpRequest();
-      xhr.open('POST', '/api/v1/tokensignin');
-      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-      xhr.onload = function() {
-        if (xhr.responseText != 'success') {
-          window.location.replace("/");
-        }
-      };
-      xhr.send('fb_token=' + response.authResponse.userID);
     }
   }
 
@@ -61,5 +46,26 @@
     FB.getLoginStatus(function(response) {
       statusChangeCallback(response);
     });
+  }
+  // --------------------------------------------------------------------------
+
+  // Send various tokens to server, but only one per page to slow things down
+  function tokenSignIn(token_type, token, name, email) {
+    if ((token_type === 'g_token' && !{{ google_oauth }})
+       || (token_type === 'fb_token' && !{{ facebook_oauth }}))
+    {
+      tokenSignInCount++;
+      if (tokenSignInCount === 1) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/v1/tokensignin');
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onload = function() {
+          if (xhr.responseText != 'success') {
+            window.location.replace("/");
+          }
+        };
+        xhr.send(token_type + '=' + token + '&name=' + name + '&email=' + email);
+      }
+    }
   }
 </script>

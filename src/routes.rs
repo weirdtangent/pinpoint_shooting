@@ -46,7 +46,9 @@ pub fn index(mut cookies: Cookies, nginx: Nginx) -> rocket_contrib::templates::T
     let context = json!({
         "title": "Dashboard",
         "google_maps_api_key": api_key,
-        "user_name": session.user_name,
+        "shooter_name": session.shooter_name,
+        "google_oauth": session.google_oauth,
+        "facebook_oauth": session.facebook_oauth,
         "x_user_agent": nginx.x_user_agent,
         "x_real_ip": nginx.x_real_ip,
     });
