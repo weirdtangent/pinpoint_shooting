@@ -62,7 +62,7 @@ pub fn rocket_prep() -> rocket::Rocket {
 
     let bind_address = &CONFIG.webservice.bind_address;
     let bind_port = &CONFIG.webservice.bind_port;
-    let version = include_str!("version.txt").trim_end_matches("\n");
+    let version = include_str!("version.txt").trim_end_matches('\n');
 
     warn!(
         applogger,

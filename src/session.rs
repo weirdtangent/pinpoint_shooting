@@ -103,7 +103,7 @@ fn verify_session_in_ddb(sessid: &String, nginx: &Nginx) -> Option<Session> {
 
     let get_item_input = GetItemInput {
         table_name: "session".to_string(),
-        key: key,
+        key,
         ..Default::default()
     };
 
@@ -164,7 +164,7 @@ pub fn save_session_to_ddb(session: &mut Session) {
 
     let put_item_input = PutItemInput {
         table_name: "session".to_string(),
-        item: item,
+        item,
         ..Default::default()
     };
 
@@ -191,7 +191,7 @@ pub fn delete_session_in_ddb(session: &Session) {
 
     let delete_item_input = DeleteItemInput {
         table_name: "session".to_string(),
-        key: key,
+        key,
         ..Default::default()
     };
 

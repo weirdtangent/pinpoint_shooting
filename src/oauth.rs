@@ -7,10 +7,10 @@ use crate::*;
 
 use crate::model::{NewOauth, Oauth, Shooter};
 
-pub fn create_oauth<'a>(
+pub fn create_oauth(
     connection: &PgConnection,
-    vendor: &'a String,
-    user_id: &'a String,
+    vendor: &str,
+    user_id: &str,
     shooterid: i32,
 ) -> Oauth {
     use crate::schema::oauth::dsl::*;
@@ -27,36 +27,26 @@ pub fn create_oauth<'a>(
         .expect("Error saving new Oauth")
 }
 
-pub fn verify_google_oauth(
-    session: &mut Session,
-    token: &String,
-    name: &String,
-    email: &String,
-) -> bool {
+pub fn verify_google_oauth(session: &mut Session, token: &str, name: &str, email: &str) -> bool {
     let mut google = google_signin::Client::new();
     google.audiences.push(CONFIG.google_api_client_id.clone());
 
     let id_info = google.verify(&token).expect("Expected token to be valid");
-    let token = id_info.sub.clone();
+    let token = id_info.sub;
 
-    verify_token(session, "google".to_string(), &token, &name, &email)
+    verify_token(session, "google".to_string(), &token, name, email)
 }
 
-pub fn verify_facebook_oauth(
-    session: &mut Session,
-    token: &String,
-    name: &String,
-    email: &String,
-) -> bool {
-    verify_token(session, "facebook".to_string(), &token, &name, &email)
+pub fn verify_facebook_oauth(session: &mut Session, token: &str, name: &str, email: &str) -> bool {
+    verify_token(session, "facebook".to_string(), &token, name, email)
 }
 
 fn verify_token(
     session: &mut Session,
     vendor: String,
-    token: &String,
-    name: &String,
-    email: &String,
+    token: &str,
+    name: &str,
+    email: &str,
 ) -> bool {
     use crate::schema::oauth::dsl::*;
     use crate::schema::shooter::dsl::*;
@@ -69,18 +59,14 @@ fn verify_token(
         // token WAS found in oauth table
         Ok(o) => {
             if let Some(id) = session.shooter_id {
-                if id == o.shooter_id {
-                    return true;
-                } else {
-                    return false;
-                }
+                id == o.shooter_id
             } else {
                 // log in user
                 //if let Ok(s) = Shooter::belonging_to(&o).load::<Shooter>(&connection) {
                 //    session.shooter_id = Some(shooter.shooter_id);
                 //    session.shooter_name = Some(shooter.shooter_name);
                 //    session.email_address = Some(shooter.email);
-                return true;
+                true
                 //} else {
                 //    return false;
                 //}
@@ -103,8 +89,13 @@ fn verify_token(
                 }
                 // email address not found in shooter table
                 Err(diesel::NotFound) => {
-                    let this_shooter =
-                        create_shooter(&connection, name, None, email, &"active".to_string());
+                    let this_shooter = create_shooter(
+                        &connection,
+                        &String::from(name),
+                        None,
+                        &String::from(email),
+                        &"active".to_string(),
+                    );
                     session.shooter_id = Some(this_shooter.shooter_id);
                     create_oauth(&connection, &vendor, token, this_shooter.shooter_id);
                     true

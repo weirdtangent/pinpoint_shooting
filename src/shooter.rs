@@ -5,10 +5,10 @@ use crate::model::{NewShooter, Shooter};
 
 pub fn create_shooter<'a>(
     connection: &PgConnection,
-    name: &'a String,
-    password: Option<&'a String>,
-    email: &'a String,
-    status: &'a String,
+    name: &'a str,
+    password: Option<&'a str>,
+    email: &'a str,
+    status: &'a str,
 ) -> Shooter {
     use crate::schema::shooter::dsl::*;
 

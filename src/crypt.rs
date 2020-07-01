@@ -55,7 +55,7 @@ pub fn encrypt(
                 .take_read_buffer()
                 .take_remaining()
                 .iter()
-                .map(|&i| i),
+                .cloned(),
         );
 
         match result {
@@ -94,7 +94,7 @@ pub fn decrypt(
                 .take_read_buffer()
                 .take_remaining()
                 .iter()
-                .map(|&i| i),
+                .cloned(),
         );
         match result {
             BufferResult::BufferUnderflow => break,
