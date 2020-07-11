@@ -30,6 +30,7 @@ rocket-slog = "0.4.0"
 sha2 = "0.8.0"
 rusoto_core = "0.40.0"
 rusoto_dynamodb = "0.40.0"
+rusoto_secretsmanager = "0.40.0"
 time = "0.1.42"
 google-signin = "0.3.0"
 

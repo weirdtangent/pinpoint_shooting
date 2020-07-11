@@ -1,6 +1,8 @@
 use config::{Config, Environment, File};
 use dotenv::dotenv;
 use once_cell::sync::Lazy;
+use rusoto_core::Region;
+use rusoto_secretsmanager::{GetSecretValueRequest, SecretsManager, SecretsManagerClient};
 use serde::Deserialize;
 use std::env;
 
@@ -39,6 +41,11 @@ pub struct Settings {
     pub google_maps_api_key: String,
 }
 
+#[derive(Debug, Deserialize)]
+struct AWSSecret {
+    key: String,
+}
+
 pub static CONFIG: Lazy<Settings> = Lazy::new(|| {
     dotenv().ok();
     let mut config = Config::default();
@@ -56,8 +63,39 @@ pub static CONFIG: Lazy<Settings> = Lazy::new(|| {
         .unwrap()
         .merge(Environment::new())
         .unwrap();
+
+    // now pull secrets from AWS
+    // note, AWS secrets include PPS_ prefix for this application
+    for secret in vec![
+        "database_urls",
+        "google_api_client_id",
+        "google_api_client_secret",
+        "google_maps_api_key",
+        "facebook_app_id",
+        "facebook_app_secret",
+    ] {
+        config
+            .set(secret, get_secret(format!("PPS_{}", secret)).key)
+            .unwrap();
+    }
+
+    // config setup ready
     match config.try_into() {
         Ok(c) => c,
         Err(e) => panic!("error parsing config files: {}", e),
     }
 });
+
+fn get_secret(secret: String) -> AWSSecret {
+    let secrets_manager = SecretsManagerClient::new(Region::UsEast1);
+    match secrets_manager
+        .get_secret_value(GetSecretValueRequest {
+            secret_id: secret.clone(),
+            ..Default::default()
+        })
+        .sync()
+    {
+        Ok(resp) => serde_json::from_str(&resp.secret_string.unwrap()).unwrap(),
+        Err(err) => panic!("Could not retrieve secret {} from AWS: {:?}", secret, err),
+    }
+}
