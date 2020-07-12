@@ -67,7 +67,7 @@ pub static CONFIG: Lazy<Settings> = Lazy::new(|| {
     // now pull secrets from AWS
     // note, AWS secrets include PPS_ prefix for this application
     for secret in vec![
-        "database_urls",
+        "database_url",
         "google_api_client_id",
         "google_api_client_secret",
         "google_maps_api_key",
