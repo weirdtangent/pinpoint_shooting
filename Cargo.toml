@@ -53,4 +53,4 @@ features = ["serve","handlebars_templates","helmet","json"]
 
 [dependencies.diesel]
 version = "1.4.2"
-features = ["postgres","chrono"]
+features = ["mysql","chrono"]

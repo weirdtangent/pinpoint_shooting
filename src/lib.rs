@@ -35,8 +35,8 @@ use rusoto_dynamodb::DynamoDbClient;
 use logging::LOGGING;
 use settings::CONFIG;
 
-pub fn connect_pgsql() -> PgConnection {
-    PgConnection::establish(&CONFIG.database_url).expect(&format!("Error connecting to db"))
+pub fn connect_mysql() -> MysqlConnection {
+    MysqlConnection::establish(&CONFIG.database_url).expect(&format!("Error connecting to db"))
 }
 
 pub fn connect_dynamodb() -> DynamoDbClient {

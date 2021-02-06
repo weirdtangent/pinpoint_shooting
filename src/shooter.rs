@@ -4,7 +4,7 @@ use rand::{distributions::Alphanumeric, thread_rng, Rng};
 use crate::model::{NewShooter, Shooter};
 
 pub fn create_shooter<'a>(
-    connection: &PgConnection,
+    connection: &MysqlConnection,
     name: &'a str,
     password: Option<&'a str>,
     email: &'a str,
@@ -28,6 +28,11 @@ pub fn create_shooter<'a>(
 
     diesel::insert_into(shooter)
         .values(&new_shooter)
-        .get_result(connection)
-        .expect("Error saving new Shooter")
+        .execute(connection)
+        .unwrap();
+
+    shooter
+        .filter(shooter_email.eq(email))
+        .first::<Shooter>(connection)
+        .unwrap()
 }

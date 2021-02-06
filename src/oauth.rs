@@ -8,7 +8,7 @@ use crate::*;
 use crate::model::{NewOauth, Oauth, Shooter};
 
 pub fn create_oauth(
-    connection: &PgConnection,
+    connection: &MysqlConnection,
     vendor: &str,
     user_id: &str,
     shooterid: i32,
@@ -23,8 +23,14 @@ pub fn create_oauth(
 
     diesel::insert_into(oauth)
         .values(&new_oauth)
-        .get_result(connection)
-        .expect("Error saving new Oauth")
+        .execute(connection)
+        .unwrap();
+
+    oauth
+        .filter(oauth_vendor.eq(vendor.to_string()))
+        .filter(shooter_id.eq(shooterid))
+        .first::<Oauth>(connection)
+        .unwrap()
 }
 
 pub fn verify_google_oauth(session: &mut Session, token: &str, name: &str, email: &str) -> bool {
@@ -50,7 +56,7 @@ fn verify_token(
 ) -> bool {
     use crate::schema::oauth::dsl::*;
     use crate::schema::shooter::dsl::*;
-    let connection = connect_pgsql();
+    let connection = connect_mysql();
     match oauth
         .filter(oauth_vendor.eq(&vendor))
         .filter(oauth_user.eq(&token))
