@@ -1,0 +1,7 @@
+{{- define "_messages" -}}
+                  {{if .messages.Messages }}
+                    {{range .messages.Messages }}
+                      <div class="pe-2 text-{{.Level}}">{{.Text}}</div>
+                    {{end}}
+                  {{end}}
+{{- end}}

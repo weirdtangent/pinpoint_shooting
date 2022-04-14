@@ -1,0 +1,30 @@
+{{- define "about" -}}
+{{ template "_header" . }}
+      <div class="row g-0"><!-- row -->
+        <div id="left-column" class="col-sm-5 col-md-4 col-xl-3 col-xxl-2 bg-dark full-height">
+          {{- template "_sidemenu" . }}
+        </div><!-- left-column -->
+
+        <div id="main-content" class="gx-5 col-sm-7 col-md-8 col-xl-9 col-xxl-10 bg-dark top-box main-content">
+          {{- template "_topmenu" . }}
+          <div class="row" style="margin: 0px; height:88%;">
+            <h4 class="ps-2 bg-warning text-dark">About</h4>
+            <div class="mx-2 my-2 pb-2">
+              {{template "about-contents"}}
+            </div>
+
+            <dl class="list-group">
+            {{range .commits}}
+              <dt class="list-group-item list-group-item-primary">
+                {{.Commit.Author.Date}} by <a href="{{.Author.URL}}" target="_blank">{{.Author.Login}}</a>
+                SHA: <a class="small text-danger" href="{{.URL}}" target="_blank">{{.SHA}}</a>
+              </dt>
+              <dd class="list-group-item ps-5">{{.Commit.Message}}</dd>
+            {{end}}
+            </dl>
+          </div><!-- maprow -->
+          {{- template "_bottomrow" . }}
+      </div><!-- row -->
+{{ template "_footer" . }}
+{{ template "_end" . }}
+{{- end }}

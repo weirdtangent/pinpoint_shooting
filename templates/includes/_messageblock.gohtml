@@ -1,0 +1,12 @@
+{{- define "_messageblock" -}}
+            {{if .messages.Messages }}
+              <figure>
+                <figcaption class="py-2">Messages:</figcaption>
+                <ul class="mx-2 list-group">
+                {{range .messages.Messages }}
+                  <li class="list-group-item text-{{.Level}}">{{.Text}}</li>
+                {{end}}
+                </ul>
+              </figure>
+            {{end}}
+{{- end}}

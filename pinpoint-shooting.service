@@ -1,0 +1,28 @@
+[Unit]
+Description=PinpointShooting
+ConditionPathExists=/www/pinpoint-shooting
+After=network.target
+ 
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+LimitNOFILE=1024
+
+Restart=on-failure
+RestartSec=10
+
+WorkingDirectory=/www/pinpoint-shooting
+ExecStart=/www/pinpoint-shooting/pinpoint-shooting
+
+# make sure log directory exists and owned by syslog
+PermissionsStartOnly=true
+ExecStartPre=/bin/mkdir -p /www/pinpoint-shooting/logs
+ExecStartPre=/bin/chown ubuntu:ubuntu /www/pinpoint-shooting/logs
+ExecStartPre=/bin/chmod 777 /www/pinpoint-shooting/logs
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=pinpoint-shooting
+ 
+[Install]
+WantedBy=multi-user.target

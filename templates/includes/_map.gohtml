@@ -1,0 +1,13 @@
+{{- define "_map" }}
+        <div class="row" style="margin: 0px; height:88%;">
+          <div id="map">
+            <script nonce="{{.nonce}}">
+              var map;
+              function initMap() {
+                map = new google.maps.Map(document.getElementById('map'), { center: {lat: 37.495230, lng: -80.136490}, zoom: 12, mapTypeId: 'hybrid' });
+              }
+            </script>
+            <script src="https://maps.googleapis.com/maps/api/js?key={{ .google_maps_api_key }}&callback=initMap" async defer></script>
+          </div>
+        </div><!-- maprow -->
+{{- end -}}
