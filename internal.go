@@ -81,14 +81,14 @@ func JSONReportHandler() http.HandlerFunc {
 
 		inputPutObj := &s3.PutObjectInput{
 			Body:   aws.ReadSeekCloser(strings.NewReader(cspReport)),
-			Bucket: aws.String("graystorm-stockwatch"),
+			Bucket: aws.String("pinpoint-shooting"),
 			Key:    aws.String(logKey),
 		}
 
 		_, err := s3svc.PutObject(inputPutObj)
 		if err != nil {
 			logger.Warn().Err(err).
-				Str("bucket", "graystorm-stockwatch").
+				Str("bucket", "pinpoint-shooting").
 				Str("key", logKey).
 				Msg("Failed to upload to S3 bucket")
 		}
