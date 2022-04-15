@@ -1,36 +1,63 @@
 body {
-  min-height: 880px;
+  min-height: 660px;
   background-color: #444444;
   font-family: 'Noto Sans', sans-serif !important;
 }
 
 a {
-  color: #F5E239 !important;
+  color: red !important;
 }
-
+a:visited {
+  color: red !important;
+}
 a:hover {
   cursor: pointer;
-  color: #F5E239 !important;
+  color: red !important;
 }
 
-.logo {
-  background-color: #375a7f;
-}
-
-div.logo {
+#logo {
+  background-color: #000000;
+  text-align: center;
   padding: 3px;
+  border-bottom: 5px solid rgb(48, 48, 48);
+}
+
+#logo img {
+  height: 100%;
+  width: 100%;
 }
 
 .full-height {
   min-height: calc(100vh);
 }
 
-.main-content {
-  min-height: calc(100vh-100px);
+#left-column {
+  background-color: #000000 !important;
 }
 
-.left-column {
-  border: 4px solid #375a7f;
+#main-content {
+  height: calc(100vh);
+  overflow-y: scroll;
+  overflow-x: none;
+}
+
+#top-menu {
+  height: 100px;
+}
+
+#content,
+#text-content,
+#map-content {
+  margin: 0px;
+  height: calc(100vh - 150px);
+}
+
+#text-content {
+  max-width: 600px;
+}
+
+#bottom-row {
+  height: 50px;
 }
 
 .sm {
@@ -122,13 +149,13 @@ footer p {
 .flush-left {
   text-align: -webkit-left;
   text-align: -moz-left;
-  text-align: -o-left; 
+  text-align: -o-left;
   text-align: -ms-left;
 }
 
 .flush-right {
   text-align: -webkit-right;
   text-align: -moz-right;
-  text-align: -o-right; 
+  text-align: -o-right;
   text-align: -ms-right;
 }

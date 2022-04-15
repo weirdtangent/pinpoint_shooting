@@ -1,0 +1,9 @@
+#content {
+  margin: 0px;
+  max-height:calc(100vh-125px);
+}
+
+#content a,
+#content a:visited {
+  color: blue !important;
+}

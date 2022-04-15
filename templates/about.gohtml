@@ -1,30 +1,50 @@
 {{- define "about" -}}
-{{ template "_header" . }}
+{{- template "_header" . }}
       <div class="row g-0"><!-- row -->
-        <div id="left-column" class="col-sm-5 col-md-4 col-xl-3 col-xxl-2 bg-dark full-height">
-          {{- template "_sidemenu" . }}
-        </div><!-- left-column -->
+        {{- template "_sidemenu" . }}
 
-        <div id="main-content" class="gx-5 col-sm-7 col-md-8 col-xl-9 col-xxl-10 bg-dark top-box main-content">
-          {{- template "_topmenu" . }}
-          <div class="row" style="margin: 0px; height:88%;">
-            <h4 class="ps-2 bg-warning text-dark">About</h4>
-            <div class="mx-2 my-2 pb-2">
-              {{template "about-contents"}}
-            </div>
+        <div id="main-content" class="gx-5 col-sm-7 col-md-8 col-xl-9 col-xxl-10 bg-dark top-box">
+          {{- template "_topmenu" . -}}
 
-            <dl class="list-group">
-            {{range .commits}}
-              <dt class="list-group-item list-group-item-primary">
-                {{.Commit.Author.Date}} by <a href="{{.Author.URL}}" target="_blank">{{.Author.Login}}</a>
-                SHA: <a class="small text-danger" href="{{.URL}}" target="_blank">{{.SHA}}</a>
-              </dt>
-              <dd class="list-group-item ps-5">{{.Commit.Message}}</dd>
-            {{end}}
-            </dl>
-          </div><!-- maprow -->
+          <div id="content" class="row">
+            <div class="accordion" id="aboutAccordion">
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="README">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    <i class="fa-solid fa-note pe-2"></i> ReadMe
+                  </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="README" data-bs-parent="#aboutAccordion">
+                  <div class="accordion-body bg-light text-dark fs-6 lh-sm">
+                    {{template "about-contents"}}
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="Commits">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    <i class="fa-solid fa-code-commit pe-2"></i> Commits
+                  </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="Commits" data-bs-parent="#aboutAccordion">
+                  <div class="accordion-body bg-light text-dark fs-6 lh-sm">
+                    <ul>
+                    {{range .commits}}
+                      <li>
+                        <p class="fs-5">{{.Commit.Message}}<br/>
+                        <span class="fs-6 tiny fw-light">{{.Commit.Author.Date}} by <a href="{{.Author.URL}}" target="_blank">{{.Author.Login}}</a>
+                        SHA: <a class="small text-danger" href="{{.URL}}" target="_blank">{{.SHA}}</a></span>
+                        </p>
+                      </li>
+                    {{end}}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div><!-- aboutAccoridion -->
+          </div><!-- content -->
+
           {{- template "_bottomrow" . }}
       </div><!-- row -->
-{{ template "_footer" . }}
 {{ template "_end" . }}
 {{- end }}

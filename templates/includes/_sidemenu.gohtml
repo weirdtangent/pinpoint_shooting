@@ -1,22 +1,9 @@
 {{- define "_sidemenu" }}
-          <div style="width: 100%; background-color: black; text-align: center;">                                                                                                                                                           
-            <a href="https://rust.graystorm.com/" target="_new"><img class="logo" src="/static/images/profile_picture.png"></a>                                                                                                             
+        <div id="left-column" class="col-sm-5 col-md-4 col-xl-3 col-xxl-2 full-height">
+          <div id="logo">
+            <a href="/"><img src="/static/images/pinpoint-shooting-logo.png"></a>
           </div>                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                            
-          <footer class="footer fixed-bottom fs-6 align-middle text-light row">                                                                                                                                                             
-            <p class="lh-1 small"><a class="py-0 mt-0" href="/about">About</a></p>                                                                                                                                                        
-            <p class="lh-1 small">                                                                                                                                                                                                        
-              <a class="py-0 mt-0" href="/privacy">Privacy Policy</a><br>                                                                                                                                                                 
-              contact <a href="mailto:privacy@graystorm.com" class="text-decoration-none">privacy@graystorm.com</a>                                                                                                                       
-            </p>                                                                                                                                                                                                                          
-            <p class="lh-1 small"><a class="py-0 mt-0" href="/terms">Terms and Conditions</a></p>                                                                                                                                         
-            <p class="lh-1 small">                                                                                                                                                                                                        
-              &copy;2021 -                                                                                                                                                                                                                
-              <a href="mailto:jeff@graystorm.com" class="text-decoration-none">Graystorm Technlogies LLC</a>                                                                                                                              
-            </p>                                                                                                                                                                                                                          
-            <p class="lh-1 small">                                                                                                                                                                                                        
-              Email to <a href="mailto:request@graystorm.com?subject=PinpointShooting%20Permission%20Request&body=My%20Google%20email%20address%20is%3a%20" class="text-decoration-none">Request</a> Google OAuth access<br/>             
-              while in testing. Or browse the <a href="https://github.com/weirdtangent/pinpoint-shooting" target="_blank" class="text-decoration-none"><i class="fab fa-github"></i> Repo</a>.                                            
-            </p>                                                                                                                                                                                                                          
-          </footer>                                                                                                                                                                                                                         
+        
+          {{- template "_footer" -}}
+        </div>
 {{- end}}
