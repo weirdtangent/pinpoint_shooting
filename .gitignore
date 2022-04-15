@@ -1,1 +1,10 @@
+pinpoint-shooting
+logs/
+utils/data
 static/css/.sass-cache
+static/css/custom*.css
+static/css/custom*.map
+static/vendor/bootstrap/*
+static/vendor/echarts/*
+static/vendor/fontawesome/*
+static/vendor/jquery/*
