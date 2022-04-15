@@ -5,6 +5,8 @@
     <meta http-equiv="content-type" content="text/html;charset=utf-8" />
     <meta name="google-signin-client_id" content="576686404285-need7p28d8696djb8rkt1dpqt0ii81ht.apps.googleusercontent.com" />
     <meta name="google-site-verification" content="64e4sfUjdp6WkM1NN0t5f3OfhJvWfu1o9zNPYXoChho" />
+    <meta name="msvalidate.01" content="6FFF19E03DBE868A750489C711DD5448" />
+    <meta name="yandex-verification" content="4c5f4949b5566ea5" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link href="/static/vendor/yahoo/cssnormalize-min.css" rel="stylesheet" />
@@ -14,28 +16,25 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap" rel="stylesheet" />
 
+    <!-- Google Tag Manager -->
+    <script nonce="{{ .nonce }}">(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NH6GMKP');</script>
+
     <script src="https://kit.fontawesome.com/59cb8a6bb8.js" crossorigin="anonymous"></script>
     <script src="/static/vendor/jquery/jquery-3.6.0.min.js"></script>
     <script src="/static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="https://apis.google.com/js/platform.js?onload=initGSO" async defer></script>
-
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4T13PLL6QK"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-4T13PLL6QK');
-    </script>
-
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
-
     <script src="/static/js/global.js"></script>
     <script src="/static/js/{{.config.template_name}}.js"></script>
     <title>PinpointShooting by Graystorm Technologies</title>
   </head>
 
   <body id="page-top" class="{{.config.template_name}}">
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NH6GMKP"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div><!-- viewport -->
 {{- end -}}
