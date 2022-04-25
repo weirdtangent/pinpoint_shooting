@@ -42,10 +42,7 @@ func main() {
 	}
 
 	// connect to MySQL
-	db, err := myaws.DBConnect(awssess, "pinpoint", "pinpoint")
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed to connect to MySQL")
-	}
+	db := myaws.DBMustConnect(awssess, "pinpoint")
 	_, err = db.Exec("SET NAMES utf8mb4 COLLATE utf8mb4_general_ci")
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to switch RDS to UTF8")
