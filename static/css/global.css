@@ -5,10 +5,10 @@ body {
 }
 
 a {
-  color: red !important;
+  color: #a0abb6 !important;
 }
 a:visited {
-  color: red !important;
+  color: #a0abb6 !important;
 }
 a:hover {
   cursor: pointer;

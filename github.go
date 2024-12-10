@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -10,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/gomarkdown/markdown"
-	"github.com/rs/zerolog/log"
 )
 
 type Contents struct {
@@ -34,14 +32,15 @@ type Commit struct {
 	URL string `json:"html_url"`
 }
 
-func getGithubCommits(ctx context.Context) (*string, *[]Commit, error) {
-	logger := log.Ctx(ctx)
+func getGithubCommits(deps *Dependencies) (*string, *[]Commit, error) {
+	sublog := deps.logger
+	secrets := deps.secrets
 
 	var commitsResponse []Commit
 	var readmeResponse Contents
 	var readme string
 
-	github_oauth_key := ctx.Value(ContextKey("github_oauth_key")).(string)
+	github_oauth_key := secrets["github_oauth_key"]
 
 	url := "https://api.github.com/repos/weirdtangent/pinpoint_shooting/contents/README.md"
 	req, _ := http.NewRequest("GET", url, nil)
@@ -51,10 +50,7 @@ func getGithubCommits(ctx context.Context) (*string, *[]Commit, error) {
 	res, _ := http.DefaultClient.Do(req)
 	if res.StatusCode != http.StatusOK {
 		err := "failed to receive 200 success code from HTTP request"
-		logger.Error().
-			Str("url", url).
-			Int("status_code", res.StatusCode).
-			Msg(err)
+		sublog.Error().Str("url", url).Int("status_code", res.StatusCode).Msg(err)
 		return &readme, &commitsResponse, fmt.Errorf(err)
 	}
 
@@ -63,10 +59,7 @@ func getGithubCommits(ctx context.Context) (*string, *[]Commit, error) {
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		logger.Error().
-			Err(err).
-			Int("status_code", res.StatusCode).
-			Msg("Failed to ready body of response")
+		sublog.Error().Err(err).Int("status_code", res.StatusCode).Msg("failed to ready body of response")
 		return &readme, &commitsResponse, err
 	}
 
@@ -81,12 +74,9 @@ func getGithubCommits(ctx context.Context) (*string, *[]Commit, error) {
 
 	res, _ = http.DefaultClient.Do(req)
 	if res.StatusCode != http.StatusOK {
-		err := "failed to receive 200 success code from HTTP request"
-		logger.Error().
-			Str("url", url).
-			Int("status_code", res.StatusCode).
-			Msg(err)
-		return &readme, &commitsResponse, fmt.Errorf(err)
+		err := fmt.Errorf("failed to receive 200 success code from HTTP request")
+		sublog.Error().Err(err).Str("url", url).Int("status_code", res.StatusCode).Msg("failed to get 200i status code")
+		return &readme, &commitsResponse, err
 	}
 
 	// request got a 200 response, lets read the results
@@ -94,10 +84,7 @@ func getGithubCommits(ctx context.Context) (*string, *[]Commit, error) {
 
 	body, err = io.ReadAll(res.Body)
 	if err != nil {
-		logger.Error().
-			Err(err).
-			Int("status_code", res.StatusCode).
-			Msg("Failed to ready body of response")
+		sublog.Error().Err(err).Int("status_code", res.StatusCode).Msg("failed to ready body of response")
 		return &readme, &commitsResponse, err
 	}
 

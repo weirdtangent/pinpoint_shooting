@@ -4,10 +4,10 @@ import (
 	"net/http"
 )
 
-func homeHandler(tmplname string) http.HandlerFunc {
+func homeHandler(deps *Dependencies, tmplname string) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
-		webdata := ctx.Value(ContextKey("webdata")).(map[string]interface{})
+		webdata := deps.webdata
+
 		//params := r.URL.Query()
 
 		//signoutParam := params.Get("signout")
@@ -17,9 +17,9 @@ func homeHandler(tmplname string) http.HandlerFunc {
 		//}
 
 		if tmplname == "about" {
-			webdata["about-contents_template"], webdata["commits"], _ = getGithubCommits(ctx)
+			webdata["about-contents_template"], webdata["commits"], _ = getGithubCommits(deps)
 		}
 
-		renderTemplateDefault(w, r, tmplname)
+		renderTemplateDefault(w, r, deps, tmplname)
 	})
 }

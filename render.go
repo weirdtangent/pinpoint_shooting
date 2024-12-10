@@ -8,19 +8,19 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func renderTemplateDefault(w http.ResponseWriter, r *http.Request, tmplname string) {
-	ctx := r.Context()
-	config := ctx.Value(ContextKey("config")).(map[string]interface{})
-	webdata := ctx.Value(ContextKey("webdata")).(map[string]interface{})
-	messages := ctx.Value(ContextKey("messages")).(*[]Message)
-	logger := log.Ctx(ctx)
+func renderTemplateDefault(w http.ResponseWriter, r *http.Request, deps *Dependencies, tmplname string) {
+	config := deps.config
+	webdata := deps.webdata
+	messages := deps.messages
+	secrets := deps.secrets
+	sublog := deps.logger
 
 	config["template_name"] = tmplname
 
-	webdata["messages"] = Messages{*messages}
+	webdata["messages"] = Messages{messages}
 	webdata["config"] = config
-	webdata["nonce"] = ctx.Value(ContextKey("nonce")).(string)
-	webdata["google_maps_api_key"] = ctx.Value(ContextKey("google_maps_api_key")).(string)
+	webdata["nonce"] = deps.nonce
+	webdata["google_maps_api_key"] = secrets["google_maps_api_key"]
 
 	funcMap := template.FuncMap{
 		"FormatUnixTime":    FormatUnixTime,
@@ -30,47 +30,41 @@ func renderTemplateDefault(w http.ResponseWriter, r *http.Request, tmplname stri
 	tmpl := template.New("blank").Funcs(funcMap)
 	tmpl, err := tmpl.ParseGlob("templates/includes/*.gohtml")
 	if err != nil {
-		logger.Error().Err(err).Str("template_dir", "includes").Msg("Failed to parse template(s)")
+		sublog.Error().Err(err).Str("template_dir", "includes").Msg("failed to parse 'include' template(s)")
 	}
 	//tmpl, err = tmpl.ParseGlob("templates/modals/*.gohtml")
 	//if err != nil {
-	//	logger.Error().Err(err).Str("template_dir", "modals").Msg("Failed to parse template(s)")
+	//	sublog.Error().Err(err).Str("template_dir", "modals").Msg("Failed to parse template(s)")
 	//}
 	// Parse variable "about" page into template
 	if val, ok := webdata["about-contents_template"]; ok {
 		tmpl, err = tmpl.Parse("{{ define \"about-contents\" }}" + *val.(*string) + "{{end}}")
 		if err != nil {
-			logger.Error().Err(err).Msg("Failed to parse 'about' page into template")
+			sublog.Error().Err(err).Msg("Failed to parse 'about' page into template")
 		}
 	}
 	tmpl, err = tmpl.ParseFiles("templates/" + tmplname + ".gohtml")
 	if err != nil {
-		logger.Error().Err(err).Str("template", tmplname).Msg("Failed to parse template")
+		sublog.Error().Err(err).Str("template", tmplname).Msg("failed to parse template")
 	}
 
 	err = tmpl.ExecuteTemplate(w, tmplname, webdata)
 	if err != nil {
-		logger.Error().Err(err).
-			Str("template", tmplname).
-			Msg("Failed to execute template")
+		sublog.Error().Err(err).Str("template", tmplname).Msg("failed to execute template")
 	}
 }
 
 func renderTemplateToString(tmplname string, data interface{}) (template.HTML, error) {
 	tmpl, err := template.ParseFiles("templates/" + tmplname + ".gohtml")
 	if err != nil {
-		log.Warn().Err(err).
-			Str("template", tmplname).
-			Msg("Failed to parse template")
+		log.Warn().Err(err).Str("template", tmplname).Msg("failed to parse template")
 		return "", err
 	}
 
 	var html bytes.Buffer
 	err = tmpl.ExecuteTemplate(&html, tmplname, nil)
 	if err != nil {
-		log.Warn().Err(err).
-			Str("template", tmplname).
-			Msg("Failed to execute template")
+		log.Warn().Err(err).Str("template", tmplname).Msg("failed to execute template")
 		return "", err
 	}
 

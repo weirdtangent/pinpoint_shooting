@@ -2,8 +2,16 @@
         <div id="left-column" class="col-sm-5 col-md-4 col-xl-3 col-xxl-2 full-height">
           <div id="logo">
             <a href="/"><img src="/static/images/pinpoint-shooting-logo.png"></a>
-          </div>                                                                                                                                                                                                                            
-        
+          </div>
+
+          <div class="d-flex flex-column align-items-center pt-3">
+            <div class="login align-self-center py-1"><a href="/auth/google" class="bg-primary text-light btn btn-block btn-social"><i class="fa fa-google pe-2"></i>Sign in with Google</a></div>
+            <div class="login align-self-center py-1"><a href="/auth/facebook" class="bg-primary text-light btn btn-block btn-social"><i class="fa fa-facebook pe-2"></i>Sign in with Facebook</a></div>
+            <div class="login align-self-center py-1"><a href="/auth/github" class="bg-primary text-light btn btn-block btn-social"><i class="fa fa-github pe-2"></i>Sign in with GitHub</a></div>
+            <div class="login align-self-center py-1"><a href="/auth/amazon" class="bg-primary text-light btn btn-block btn-social"><i class="fa fa-amazon pe-2"></i>Sign in with Amazon</a></div>
+            <div class="login align-self-center py-1"><a href="/auth/twitter" class="bg-primary text-light btn btn-block btn-social"><i class="fa fa-twitter pe-2"></i>Sign in with Twitter</a></div>
+          </div>
+
           {{- template "_footer" -}}
         </div>
 {{- end}}
