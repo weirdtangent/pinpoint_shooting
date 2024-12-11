@@ -1,5 +1,5 @@
 pinpoint-shooting
-log/
+logs/
 utils/data
 static/css/.sass-cache
 static/css/custom*.css
@@ -8,6 +8,3 @@ static/vendor/bootstrap/*
 static/vendor/echarts/*
 static/vendor/fontawesome/*
 static/vendor/jquery/*
-.env
-Cargo.lock
-target/
