@@ -1,0 +1,28 @@
+[Unit]
+Description=Pinpoint Shooting
+ConditionPathExists=/home/ubuntu/projects/rust/pinpoint_shooting
+After=network.target
+ 
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+LimitNOFILE=1024
+
+Restart=on-failure
+RestartSec=10
+
+WorkingDirectory=/home/ubuntu/projects/rust/pinpoint_shooting
+ExecStart=/home/ubuntu/projects/rust/pinpoint_shooting/target/release/pps
+
+# make sure log directory exists and owned by syslog
+PermissionsStartOnly=true
+ExecStartPre=/bin/mkdir -p /www/stockwatch/logs
+ExecStartPre=/bin/chown ubuntu:ubuntu /home/ubuntu/projects/rust/pinpoint_shooting/log
+ExecStartPre=/bin/chmod 777 /home/ubuntu/projects/rust/pinpoint_shooting/log
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=pps
+ 
+[Install]
+WantedBy=multi-user.target
