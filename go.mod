@@ -17,7 +17,7 @@ require (
 	github.com/prometheus/client_golang v1.20.5
 	github.com/rs/zerolog v1.33.0
 	github.com/savaki/dynastore v0.0.0-20171109173440-28d8558bb429
-	github.com/weirdtangent/myaws v1.0.6
+	github.com/weirdtangent/myaws v1.0.7
 )
 
 require (
