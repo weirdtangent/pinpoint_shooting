@@ -14,7 +14,7 @@ require (
 	github.com/gorilla/sessions v1.4.0
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/markbates/goth v1.80.0
-	github.com/prometheus/client_golang v1.21.0
+	github.com/prometheus/client_golang v1.21.1
 	github.com/rs/zerolog v1.33.0
 	github.com/savaki/dynastore v0.0.0-20171109173440-28d8558bb429
 	github.com/weirdtangent/myaws v1.0.7
@@ -34,7 +34,7 @@ require (
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.62.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
-	golang.org/x/oauth2 v0.27.0 // indirect
-	golang.org/x/sys v0.30.0 // indirect
+	golang.org/x/oauth2 v0.28.0 // indirect
+	golang.org/x/sys v0.31.0 // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
 )
